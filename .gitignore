@@ -440,3 +440,6 @@ node_modules/
 dist/
 !**/apps/
 !**/apps/*
+
+# Dữ liệu PostgreSQL cục bộ (không đưa lên git)
+.data/
