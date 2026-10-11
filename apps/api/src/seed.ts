@@ -45,7 +45,8 @@ export function seedIfEmpty(db: DB, opts: { today?: string } = {}) {
       tNames.forEach((n, i) => {
         const uidT = i === 1 ? 'u-' + un('teacher') : null;
         if (uidT) db.prepare('INSERT INTO users(id,username,name,role,center_id,pass) VALUES (?,?,?,?,?,?)').run(uidT, un('teacher'), n, 'teacher', c.id, hashPass('123456'));
-        db.prepare('INSERT INTO teachers(id,center_id,name,phone,kind,user_id) VALUES (?,?,?,?,?,?)').run(`${c.id}-t${i}`, c.id, n, '09' + String(10000000 + Math.floor(r() * 8e7)), /^[A-Z][a-z]+ [A-Z]/.test(n) && i % 2 === 0 ? 'foreign' : 'vn', uidT);
+        const kind = /^[A-Z][a-z]+ [A-Z]/.test(n) && i % 2 === 0 ? 'foreign' : 'vn';
+        db.prepare('INSERT INTO teachers(id,center_id,name,phone,kind,user_id,rate) VALUES (?,?,?,?,?,?,?)').run(`${c.id}-t${i}`, c.id, n, '09' + String(10000000 + Math.floor(r() * 8e7)), kind, uidT, kind === 'foreign' ? 400_000 : 220_000);
       });
     }
     for (const co of COURSES) {
@@ -107,6 +108,24 @@ export function seedIfEmpty(db: DB, opts: { today?: string } = {}) {
       const marks = roster.map((x) => { const q = r(); return { enrollmentId: x.enrollment_id, status: (q < 0.84 ? 'present' : q < 0.9 ? 'late' : q < 0.95 ? 'excused' : 'unexcused') as any }; });
       try { S.markAttendance(db, mgr, s.id, marks, { now: end }); } catch { /* bỏ qua ghi danh hết nợ buổi */ }
     }
+  }
+  // tuyển sinh mẫu
+  const SRC = ['facebook', 'zalo', 'walkin', 'referral', 'website', 'school'];
+  const ST = ['new', 'new', 'contacted', 'contacted', 'tested', 'trial', 'lost'];
+  for (const c of CENTERS) {
+    for (let i = 0; i < 10; i++) {
+      const st = pick(ST); const id = uid(); const now = nowIso();
+      db.prepare('INSERT INTO leads(id,center_id,name,phone,source,interest,status,assigned_to,test_score,test_level,lost_reason,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)')
+        .run(id, c.id, `${pick(LAST)} ${pick(MID)} ${pick(FIRST)}`, `09${String(10000000 + Math.floor(r() * 8e7))}`, pick(SRC), pick(['Starters', 'KET', 'IELTS 5.0', 'Flyers']), st, `u-frontdesk.${c.id}`, st === 'tested' || st === 'trial' ? 60 + Math.floor(r() * 35) : null, st === 'tested' || st === 'trial' ? pick(['A1', 'A2', 'B1']) : null, st === 'lost' ? pick(['Giá cao', 'Lịch không phù hợp', 'Xa nhà']) : null, now, now);
+      db.prepare('INSERT INTO lead_activities(id,lead_id,at,actor,note) VALUES (?,?,?,?,?)').run(uid(), id, now, `u-frontdesk.${c.id}`, 'Gọi tư vấn lần đầu');
+    }
+  }
+  // điểm kiểm tra mẫu: một bài giữa kỳ cho mỗi lớp có học viên
+  for (const cl of db.prepare(`SELECT id, center_id FROM classes`).all() as any[]) {
+    const roster = S.classRoster(db, cl.id) as any[]; if (!roster.length) continue;
+    const aid = uid();
+    db.prepare('INSERT INTO assessments(id,class_id,title,kind,date,max_score,created_by) VALUES (?,?,?,?,?,?,?)').run(aid, cl.id, 'Kiểm tra giữa kỳ', 'midterm', '2026-10-09', 10, `u-manager.${cl.center_id}`);
+    for (const x of roster) db.prepare('INSERT INTO scores(assessment_id,enrollment_id,score,comment,by_user,at) VALUES (?,?,?,?,?,?)').run(aid, x.enrollment_id, Math.round((5 + r() * 5) * 2) / 2, pick(['Tiến bộ tốt', 'Cần luyện nghe thêm', 'Chăm chỉ', 'Cần chú ý ngữ pháp']), `u-manager.${cl.center_id}`, nowIso());
   }
   // một yêu cầu hoàn phí mẫu
   const e = db.prepare(`SELECT e.id, e.center_id FROM enrollments e WHERE e.status='active' LIMIT 1 OFFSET 5`).get() as any;

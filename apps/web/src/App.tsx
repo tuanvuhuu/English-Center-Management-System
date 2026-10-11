@@ -6,15 +6,21 @@ import { Students, StudentDetail } from './pages/Students';
 import { Classes, ClassDetail } from './pages/Classes';
 import { Schedule } from './pages/Schedule';
 import { Debts, Refunds, Reports, AuditLog } from './pages/Finance';
+import { Leads } from './pages/Leads';
+import { Teachers, Timesheet } from './pages/Teachers';
 
 export interface Ctx { user: User; centerId: string; centers: { id: string; name: string }[]; go: (p: string) => void }
 
 const NAV: { g: string; items: { id: string; label: string; roles: Role[] | '*' }[] }[] = [
   { g: 'Tổng quan', items: [{ id: 'dashboard', label: 'Bảng điều khiển', roles: '*' }] },
   { g: 'Học viên', items: [{ id: 'students', label: 'Học viên', roles: '*' }] },
+  { g: 'Tuyển sinh', items: [{ id: 'leads', label: 'Lead & tư vấn', roles: ['admin', 'manager', 'frontdesk'] }] },
   { g: 'Lớp & lịch', items: [
     { id: 'classes', label: 'Danh sách lớp', roles: ['admin', 'manager', 'academic', 'frontdesk'] },
     { id: 'schedule', label: 'Lịch học & điểm danh', roles: '*' }] },
+  { g: 'Giáo viên', items: [
+    { id: 'teachers', label: 'Giáo viên', roles: ['admin', 'manager', 'academic', 'accountant'] },
+    { id: 'timesheet', label: 'Bảng công', roles: ['admin', 'manager', 'accountant', 'teacher'] }] },
   { g: 'Học phí', items: [
     { id: 'debts', label: 'Công nợ', roles: ['admin', 'manager', 'accountant', 'frontdesk'] },
     { id: 'refunds', label: 'Hoàn phí', roles: ['admin', 'manager', 'accountant'] }] },
@@ -87,6 +93,9 @@ export function App() {
         {p === 'students' && (arg ? <StudentDetail ctx={ctx} id={arg} /> : <Students ctx={ctx} />)}
         {p === 'classes' && (arg ? <ClassDetail ctx={ctx} id={arg} /> : <Classes ctx={ctx} />)}
         {p === 'schedule' && <Schedule ctx={ctx} />}
+        {p === 'leads' && <Leads ctx={ctx} />}
+        {p === 'teachers' && <Teachers ctx={ctx} />}
+        {p === 'timesheet' && <Timesheet ctx={ctx} />}
         {p === 'debts' && <Debts ctx={ctx} />}
         {p === 'refunds' && <Refunds ctx={ctx} />}
         {p === 'reports' && <Reports ctx={ctx} />}

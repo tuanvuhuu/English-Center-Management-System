@@ -5,6 +5,7 @@ import * as D from '@ecms/domain';
 import { type DB, uid, nowIso, audit } from './db.js';
 import { CAN, login, userFromReq, type Role, type User } from './auth.js';
 import * as S from './services.js';
+import { registerExtra } from './extra.js';
 
 const phoneRe = /^(0|\+84)\d{8,10}$/;
 const day = z.string().regex(/^\d{4}-\d{2}-\d{2}$/);
@@ -62,7 +63,8 @@ export function buildApp(db: DB): FastifyInstance {
   });
   app.get('/teachers', { preHandler: authed() }, async (req) => {
     const c = S.scopeCenter(U(req), (req.query as any).centerId);
-    return db.prepare(`SELECT * FROM teachers WHERE active=1 ${c ? 'AND center_id=?' : ''} ORDER BY name`).all(...(c ? [c] : []));
+    const rows = db.prepare(`SELECT * FROM teachers WHERE active=1 ${c ? 'AND center_id=?' : ''} ORDER BY name`).all(...(c ? [c] : [])) as any[];
+    return ['admin', 'manager', 'accountant'].includes(U(req).role) ? rows : rows.map(({ rate, phone, ...t }) => t);
   });
   app.get('/rooms', { preHandler: authed() }, async (req) => {
     const c = S.scopeCenter(U(req), (req.query as any).centerId);
@@ -323,6 +325,8 @@ export function buildApp(db: DB): FastifyInstance {
     });
   });
   app.get('/audit', { preHandler: authed(['admin', 'manager']) }, async (req) => db.prepare('SELECT * FROM audit ORDER BY id DESC LIMIT ?').all(Number((req.query as any).limit ?? 100)));
+
+  registerExtra(app, db, authed, U);
 
   return app;
 }

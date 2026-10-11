@@ -7,6 +7,8 @@ export function openDb(file = process.env.ECMS_DB ?? 'ecms.db'): DB {
   db.pragma('journal_mode = WAL');
   db.pragma('foreign_keys = ON');
   db.exec(SCHEMA);
+  const cols = (db.prepare('PRAGMA table_info(teachers)').all() as any[]).map((c) => c.name);
+  if (!cols.includes('rate')) db.exec('ALTER TABLE teachers ADD COLUMN rate INTEGER NOT NULL DEFAULT 0');
   return db;
 }
 
@@ -28,6 +30,10 @@ CREATE TABLE IF NOT EXISTS ledger (id TEXT PRIMARY KEY, seq INTEGER NOT NULL, en
 CREATE TABLE IF NOT EXISTS receipts (id TEXT PRIMARY KEY, enrollment_id TEXT NOT NULL REFERENCES enrollments(id), amount INTEGER NOT NULL, method TEXT NOT NULL, at TEXT NOT NULL, actor TEXT NOT NULL, note TEXT, voided_reason TEXT, voided_at TEXT, adjusts_id TEXT);
 CREATE TABLE IF NOT EXISTS attendance (session_id TEXT NOT NULL REFERENCES class_sessions(id), enrollment_id TEXT NOT NULL REFERENCES enrollments(id), status TEXT NOT NULL, ledger_id TEXT, note TEXT, by_user TEXT NOT NULL, at TEXT NOT NULL, PRIMARY KEY (session_id, enrollment_id));
 CREATE TABLE IF NOT EXISTS refunds (id TEXT PRIMARY KEY, enrollment_id TEXT NOT NULL REFERENCES enrollments(id), amount INTEGER NOT NULL, fee INTEGER NOT NULL, gross INTEGER NOT NULL, sessions INTEGER NOT NULL, reason TEXT NOT NULL, status TEXT NOT NULL DEFAULT 'wait', needs_admin INTEGER NOT NULL DEFAULT 0, requested_by TEXT NOT NULL, requested_at TEXT NOT NULL, decided_by TEXT, decided_at TEXT, decision_note TEXT);
+CREATE TABLE IF NOT EXISTS leads (id TEXT PRIMARY KEY, center_id TEXT NOT NULL REFERENCES centers(id), name TEXT NOT NULL, phone TEXT NOT NULL, source TEXT NOT NULL DEFAULT 'walkin', interest TEXT, status TEXT NOT NULL DEFAULT 'new', assigned_to TEXT, note TEXT, lost_reason TEXT, test_score REAL, test_level TEXT, trial_class_id TEXT, trial_date TEXT, student_id TEXT, created_at TEXT NOT NULL, updated_at TEXT NOT NULL);
+CREATE TABLE IF NOT EXISTS lead_activities (id TEXT PRIMARY KEY, lead_id TEXT NOT NULL REFERENCES leads(id), at TEXT NOT NULL, actor TEXT NOT NULL, note TEXT NOT NULL);
+CREATE TABLE IF NOT EXISTS assessments (id TEXT PRIMARY KEY, class_id TEXT NOT NULL REFERENCES classes(id), title TEXT NOT NULL, kind TEXT NOT NULL DEFAULT 'quiz', date TEXT NOT NULL, max_score REAL NOT NULL DEFAULT 10, created_by TEXT NOT NULL);
+CREATE TABLE IF NOT EXISTS scores (assessment_id TEXT NOT NULL REFERENCES assessments(id), enrollment_id TEXT NOT NULL REFERENCES enrollments(id), score REAL, comment TEXT, by_user TEXT NOT NULL, at TEXT NOT NULL, PRIMARY KEY (assessment_id, enrollment_id));
 CREATE TABLE IF NOT EXISTS audit (id INTEGER PRIMARY KEY AUTOINCREMENT, at TEXT NOT NULL, actor TEXT NOT NULL, action TEXT NOT NULL, entity TEXT NOT NULL, entity_id TEXT, detail TEXT);
 `;
 

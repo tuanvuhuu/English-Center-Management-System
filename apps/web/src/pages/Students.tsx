@@ -133,6 +133,25 @@ function Ledger({ id, onClose }: { id: string; onClose: () => void }) {
   </Modal>;
 }
 
+function Results({ id }: { id: string }) {
+  const { data } = useAsync(() => get(`/students/${id}/results`), [id]);
+  if (!data) return null;
+  return <div className="card"><div className="card-head"><h2>Kết quả học tập</h2>{data.attendance.rate !== null && <Chip kind={data.attendance.rate >= 80 ? 'ok' : 'warn'}>Chuyên cần {data.attendance.rate}% ({data.attendance.present}/{data.attendance.total} buổi)</Chip>}</div>
+    <Table rowKey={(r: any) => r.title + r.date + r.class_code} rows={data.results} empty="Chưa có điểm kiểm tra" cols={[{ key: 'd', head: 'Ngày', render: (r: any) => dmy(r.date) }, { key: 't', head: 'Bài', render: (r: any) => <>{r.title}<div className="muted">{r.class_code}</div></> },
+      { key: 's', head: 'Điểm', right: true, render: (r: any) => r.score == null ? '—' : <b>{r.score}/{r.max_score}</b> }, { key: 'c', head: 'Nhận xét', hideMobile: true, render: (r: any) => r.comment ?? '' }]} /></div>;
+}
+
+function TransferClass({ en, centerId, onClose, onDone }: { en: any; centerId: string; onClose: () => void; onDone: () => void }) {
+  const toast = useToast(); const [err, setErr] = useState(''); const [classId, setClassId] = useState('');
+  const { data } = useAsync(() => get(`/classes?centerId=${centerId}`), [centerId]);
+  const list = (data ?? []).filter((c: any) => c.code !== en.class_code && c.course_name === en.course_name && ['open', 'running'].includes(c.status) && c.students < c.capacity);
+  async function save() { try { await post(`/enrollments/${en.id}/transfer-class`, { classId }); toast('Đã đổi lớp, số dư buổi và công nợ được giữ nguyên'); onDone(); } catch (e) { setErr((e as Error).message); } }
+  return <Modal title="Đổi lớp trong cùng khóa" onClose={onClose} foot={<><button className="btn" onClick={onClose}>Hủy</button><button className="btn primary" disabled={!classId} onClick={save}>Đổi lớp</button></>}>
+    {err && <div className="err">{err}</div>}<p className="muted">Hiện học lớp {en.class_code}. Số buổi còn lại và học phí giữ nguyên.</p>
+    <Field label="Lớp mới" required><select className="input" value={classId} onChange={(e) => setClassId(e.target.value)}><option value="">— Chọn lớp —</option>{list.map((c: any) => <option key={c.id} value={c.id}>{c.code} · {c.students}/{c.capacity} HV</option>)}</select></Field>
+    {list.length === 0 && <p className="muted">Không có lớp khác cùng khóa còn chỗ.</p>}</Modal>;
+}
+
 export function StudentDetail({ ctx, id }: { ctx: Ctx; id: string }) {
   const toast = useToast();
   const { data, loading, error, reload } = useAsync(() => get(`/students/${id}`), [id]);
@@ -160,12 +179,15 @@ export function StudentDetail({ ctx, id }: { ctx: Ctx; id: string }) {
           {can && e.status === 'active' && <button className="btn sm" onClick={() => status(e, 'frozen')}>Bảo lưu</button>}
           {can && e.status === 'frozen' && <button className="btn sm" onClick={() => status(e, 'active')}>Học lại</button>}
           {mgr && ['active', 'frozen'].includes(e.status) && <button className="btn sm" onClick={() => setM({ kind: 'adjust', en: e })}>Điều chỉnh buổi</button>}
+          {can && e.status === 'active' && <button className="btn sm" onClick={() => setM({ kind: 'transfer', en: e })}>Đổi lớp</button>}
           {can && ['active', 'frozen'].includes(e.status) && <button className="btn sm" onClick={() => setM({ kind: 'refund', en: e })}>Hoàn phí</button>}
         </div></div>))}
+    {ctx.user.role !== 'frontdesk' && ctx.user.role !== 'accountant' && <Results id={id} />}
     {m?.kind === 'enroll' && <Enroll ctx={ctx} student={s} onClose={() => setM(null)} onDone={done} />}
     {m?.kind === 'receipt' && <Receipt en={m.en} onClose={() => setM(null)} onDone={done} />}
     {m?.kind === 'refund' && <RefundReq en={m.en} onClose={() => setM(null)} onDone={done} />}
     {m?.kind === 'adjust' && <Adjust en={m.en} onClose={() => setM(null)} onDone={done} />}
+    {m?.kind === 'transfer' && <TransferClass en={m.en} centerId={s.center_id} onClose={() => setM(null)} onDone={done} />}
     {m?.kind === 'ledger' && <Ledger id={m.en.id} onClose={() => setM(null)} />}
     {edit && <StudentForm ctx={ctx} initial={s} onClose={() => setEdit(false)} onSaved={() => { setEdit(false); reload(); }} />}
   </>);

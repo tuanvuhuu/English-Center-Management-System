@@ -45,4 +45,8 @@ export const CAN = {
   adjust: ['admin', 'manager'],
   report: ['admin', 'manager', 'accountant'],
   config: ['admin'],
+  lead: ['admin', 'manager', 'frontdesk'],
+  teacherWrite: ['admin', 'manager'],
+  timesheet: ['admin', 'manager', 'accountant'],
+  grades: ['admin', 'manager', 'academic', 'teacher'],
 } as const satisfies Record<string, readonly Role[]>;

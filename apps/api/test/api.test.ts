@@ -172,3 +172,89 @@ describe('Tổng quan & báo cáo', () => {
     for (let i = 1; i < debts.length; i++) expect(debts[i - 1].receivable).toBeGreaterThanOrEqual(debts[i].receivable);
   });
 });
+
+describe('Tuyển sinh', () => {
+  let leadId = '';
+  it('tạo lead, chặn trùng số đang theo dõi, ghi hoạt động tự chuyển sang đã liên hệ', async () => {
+    const b = { centerId: 'cg', name: 'Bùi Lead Một', phone: '0977123456', source: 'facebook', interest: 'KET' };
+    const r = await as(fd, 'POST', '/leads', b); expect(r.status).toBe(200); leadId = r.body.id;
+    expect((await as(fd, 'POST', '/leads', b)).status).toBe(409);
+    expect((await as(fd, 'POST', '/leads', { ...b, phone: '12' })).status).toBe(400);
+    await as(fd, 'POST', `/leads/${leadId}/activity`, { note: 'Gọi tư vấn, hẹn test' });
+    const d = (await as(fd, 'GET', `/leads/${leadId}`)).body;
+    expect(d.lead.status).toBe('contacted'); expect(d.activities).toHaveLength(1);
+  });
+  it('trạng thái: test cần điểm, thất bại cần lý do, không tự đặt "won"', async () => {
+    expect((await as(fd, 'PUT', `/leads/${leadId}`, { status: 'tested' })).status).toBe(400);
+    expect((await as(fd, 'PUT', `/leads/${leadId}`, { status: 'tested', testScore: 72, testLevel: 'A2' })).status).toBe(200);
+    expect((await as(fd, 'PUT', `/leads/${leadId}`, { status: 'won' })).status).toBe(400);
+    expect((await as(fd, 'PUT', `/leads/${leadId}`, { status: 'lost' })).status).toBe(400);
+  });
+  it('chốt lead: tạo học viên + ghi danh + thu tiền trong một bước; lead chốt rồi không sửa/xóa', async () => {
+    const classes = (await as(fd, 'GET', '/classes')).body as any[];
+    const cls = classes.find((c) => c.students < 8 && c.code.startsWith('STA'));
+    const r = await as(fd, 'POST', `/leads/${leadId}/convert`, { guardianName: 'Chị Lead', classId: cls.id, paid: 500_000 });
+    expect(r.status).toBe(200); expect(r.body.enrollmentId).toBeTruthy();
+    const det = (await as(fd, 'GET', `/enrollments/${r.body.enrollmentId}`)).body;
+    expect(det.money.collected).toBe(500_000);
+    expect((await as(fd, 'GET', `/leads/${leadId}`)).body.lead.status).toBe('won');
+    expect((await as(fd, 'POST', `/leads/${leadId}/convert`, { guardianName: 'x' })).status).toBe(409);
+    expect((await as(mg, 'DELETE', `/leads/${leadId}`)).status).toBe(409);
+    expect((await as(fd, 'GET', '/leads/funnel')).body.by.won).toBeGreaterThan(0);
+  });
+  it('giáo viên/kế toán không vào được tuyển sinh', async () => {
+    expect((await as('teacher.cg', 'GET', '/leads')).status).toBe(403);
+    expect((await as(ac, 'GET', '/leads')).status).toBe(403);
+  });
+});
+
+describe('Giáo viên & bảng công', () => {
+  it('thêm/sửa giáo viên (quản lý), lễ tân không được; bảng công tính từ buổi đã dạy', async () => {
+    expect((await as(fd, 'POST', '/teachers', { centerId: 'cg', name: 'Test Teacher' })).status).toBe(403);
+    const r = await as(mg, 'POST', '/teachers', { centerId: 'cg', name: 'Nguyễn Giáo Viên Mới', phone: '0966555444', rate: 250000 });
+    expect(r.status).toBe(200);
+    expect((await as(mg, 'PUT', `/teachers/${r.body.id}`, { rate: 300000 })).status).toBe(200);
+    expect((await as(mg, 'DELETE', `/teachers/${r.body.id}`)).body.deleted).toBe(true);
+    const t = (await as(mg, 'GET', '/timesheet?month=2026-09')).body;
+    expect(t.items.length).toBeGreaterThan(0);
+    for (const i of t.items) expect(i.pay).toBe(i.sessions * i.rate);
+    expect(t.totalPay).toBe(t.items.reduce((s: number, i: any) => s + i.pay, 0));
+    expect((await as(fd, 'GET', '/timesheet')).status).toBe(403);
+  });
+  it('không xóa giáo viên đang phân công lớp', async () => {
+    const ts = (await as(mg, 'GET', '/teachers')).body as any[];
+    const classes = (await as(mg, 'GET', '/classes')).body as any[];
+    const used = ts.find((t) => classes.some((c) => c.teacher_id === t.id));
+    expect((await as(mg, 'DELETE', `/teachers/${used.id}`)).status).toBe(409);
+  });
+  it('giáo viên chỉ xem bảng công của mình và không thấy đơn giá của đồng nghiệp', async () => {
+    const t = (await as('teacher.cg', 'GET', '/timesheet?month=2026-09')).body;
+    expect(t.items.length).toBeLessThanOrEqual(1);
+    const list = (await as('teacher.cg', 'GET', '/teachers')).body as any[];
+    expect(list.every((x) => x.rate === undefined)).toBe(true);
+  });
+});
+
+describe('Điểm & nhận xét', () => {
+  it('tạo bài kiểm tra, nhập điểm trong thang, sửa điểm có nhật ký; không xóa bài đã có điểm', async () => {
+    const classes = (await as(mg, 'GET', '/classes')).body as any[];
+    const c = classes.find((x) => x.students >= 2);
+    const a = await as(mg, 'POST', `/classes/${c.id}/assessments`, { title: 'Quiz Unit 3', kind: 'quiz', date: '2026-10-10', maxScore: 10 });
+    expect(a.status).toBe(200);
+    const d = (await as(mg, 'GET', `/classes/${c.id}/assessments`)).body;
+    const en = d.roster[0].enrollment_id;
+    expect((await as(mg, 'PUT', `/assessments/${a.body.id}/scores`, { scores: [{ enrollmentId: en, score: 11 }] })).status).toBe(400);
+    expect((await as(mg, 'PUT', `/assessments/${a.body.id}/scores`, { scores: [{ enrollmentId: en, score: 8, comment: 'Tốt' }] })).status).toBe(200);
+    expect((await as(mg, 'PUT', `/assessments/${a.body.id}/scores`, { scores: [{ enrollmentId: en, score: 9 }] })).status).toBe(200);
+    expect(((await as(mg, 'GET', '/audit?limit=20')).body as any[]).some((x) => x.action === 'update-score')).toBe(true);
+    expect((await as(mg, 'DELETE', `/assessments/${a.body.id}`)).status).toBe(409);
+    const sid = d.roster[0].student_id;
+    const res = (await as(mg, 'GET', `/students/${sid}/results`)).body;
+    expect(res.results.some((r: any) => r.title === 'Quiz Unit 3' && r.score === 9)).toBe(true);
+    expect(res.attendance).toHaveProperty('rate');
+  });
+  it('kế toán không nhập điểm', async () => {
+    const classes = (await as(mg, 'GET', '/classes')).body as any[];
+    expect((await as(ac, 'GET', `/classes/${classes[0].id}/assessments`)).status).toBe(403);
+  });
+});
