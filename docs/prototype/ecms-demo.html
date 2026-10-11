@@ -1,0 +1,1748 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quản lý Trung tâm Anh ngữ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* Màu chính: cam (hành động chính, điểm nhấn) — màu phụ: xanh lá (điều hướng, thông tin, dữ liệu) */
+  --brand:#E8590C; --brand-ink:#ffffff; --brand-soft:#FFF1E7; --brand-line:#FBC9A3;
+  --accent:#16794F; --accent-ink:#ffffff; --accent-soft:#E5F4EC; --accent-line:#A9D8BF;
+  --danger:#C92A2A; --danger-soft:#FBE9E9;
+  --warn:#946200; --warn-soft:#FBF3D9;
+  --ok:#22744A; --ok-soft:#E3F2E8;
+  --bg:#F5F6F8; --surface:#FFFFFF; --surface-2:#F0F2F5; --line:#E1E4EA; --line-strong:#CBD0D9;
+  --text:#1B1F27; --muted:#5D6573; --faint:#8A919E;
+  --shadow:0 12px 32px rgba(17,24,39,.14);
+  --r-sm:6px; --r:8px; --r-lg:12px;
+  --cell-attend:var(--accent); --cell-excused:#E0A82E; --cell-absent:var(--danger); --cell-makeup:#3E9C72; --cell-cancel:#C3C8D1; --cell-empty:transparent;
+  color-scheme:light;
+}
+:root[data-theme="dark"]{
+  --brand:#FF8A3D; --brand-ink:#1A0D04; --brand-soft:#3A2010; --brand-line:#6B3A1A;
+  --accent:#5CC99A; --accent-ink:#06150E; --accent-soft:#132A20; --accent-line:#285240;
+  --danger:#F07A72; --danger-soft:#3A1C1B;
+  --warn:#E3B04B; --warn-soft:#352812;
+  --ok:#5FC08A; --ok-soft:#14301F;
+  --bg:#0F131A; --surface:#161B24; --surface-2:#1C222D; --line:#283040; --line-strong:#38425A;
+  --text:#E8EBF1; --muted:#A3ABBA; --faint:#7E8696;
+  --shadow:0 16px 40px rgba(0,0,0,.5);
+  --cell-excused:#E3B04B; --cell-makeup:#3E8A66; --cell-cancel:#465063;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{font-family:"Be Vietnam Pro",system-ui,-apple-system,"Segoe UI",sans-serif;font-size:13px;line-height:1.5;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}
+button,input,select,textarea{font:inherit;color:inherit}
+.num{font-variant-numeric:tabular-nums}
+a{color:var(--accent)}
+:focus-visible{outline:2px solid var(--brand);outline-offset:2px;border-radius:4px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+
+/* ---------- buttons, inputs, chips ---------- */
+.btn{display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 12px;border-radius:var(--r);border:1px solid var(--line-strong);background:var(--surface);cursor:pointer;font-weight:500;white-space:nowrap}
+.btn:hover{background:var(--surface-2)}
+.btn svg{width:16px;height:16px}
+.btn-primary{background:var(--brand);border-color:var(--brand);color:var(--brand-ink)}
+.btn-primary:hover{background:var(--brand);filter:brightness(1.08)}
+.btn-ghost{border-color:transparent;background:transparent}
+.btn-danger{color:var(--danger);border-color:var(--danger);background:transparent}
+.btn-danger:hover{background:var(--danger-soft)}
+.btn[disabled]{opacity:.45;cursor:not-allowed}
+.btn-sm{height:28px;padding:0 9px;font-size:13px}
+.icon-btn{width:34px;padding:0;justify-content:center;border-color:transparent;background:transparent}
+.field{display:flex;flex-direction:column;gap:6px}
+.field label{font-weight:600;font-size:13px}
+.input{height:34px;border:1px solid var(--line-strong);border-radius:var(--r);background:var(--surface);padding:0 10px;width:100%}
+textarea.input{height:auto;min-height:84px;padding:8px 10px;resize:vertical}
+.input:focus{outline:none;border-color:var(--brand);box-shadow:0 0 0 3px var(--brand-soft)}
+.input.invalid{border-color:var(--danger);box-shadow:0 0 0 3px var(--danger-soft)}
+.search{position:relative}
+.search svg{position:absolute;left:10px;top:50%;width:16px;height:16px;transform:translateY(-50%);color:var(--faint)}
+.search .input{padding-left:32px;width:240px}
+.chip{display:inline-flex;align-items:center;gap:6px;height:22px;padding:0 8px;border-radius:999px;font-size:11.5px;font-weight:500;border:1px solid var(--line-strong);color:var(--muted);white-space:nowrap}
+.chip .dot{width:7px;height:7px;border-radius:50%;background:currentColor}
+.chip.s-active{color:var(--ok);border-color:currentColor;background:var(--ok-soft)}
+.chip.s-pending{color:var(--accent);border-color:var(--accent-line);background:var(--accent-soft)}
+.chip.s-hold{color:var(--warn);border-color:currentColor;background:var(--warn-soft)}
+.chip.s-stop{color:var(--danger);border-color:currentColor;background:var(--danger-soft)}
+.chip.s-done{color:var(--muted)}
+.badge{display:inline-grid;place-items:center;min-width:20px;height:20px;padding:0 6px;border-radius:999px;background:var(--surface-2);font-size:12px;font-weight:600}
+.badge.hot{background:var(--danger);color:#fff}
+.tag-inline{color:var(--faint);font-size:12px}
+
+/* ---------- app shell ---------- */
+.app{display:grid;grid-template-columns:256px minmax(0,1fr);grid-template-rows:56px 1fr;height:100vh}
+.topbar{grid-column:1/-1;display:flex;align-items:center;gap:8px;padding:0 16px;background:var(--surface);border-bottom:1px solid var(--line);position:relative;z-index:20}
+.logo{display:flex;align-items:center;gap:10px;font-weight:700;font-size:14px;margin-right:auto;min-width:0}
+.logo-mark{width:30px;height:30px;border-radius:8px;background:var(--brand);color:var(--brand-ink);display:grid;place-items:center;font-weight:700;letter-spacing:-.02em}
+.logo small{display:block;font-weight:500;color:var(--accent);font-size:12px}
+.menu-toggle{display:none}
+.top-sel{display:flex;align-items:center;gap:6px;height:34px;padding:0 10px;border-radius:var(--r);border:1px solid transparent;background:transparent;cursor:pointer;font-weight:500}
+.top-sel:hover,.top-sel[aria-expanded="true"]{background:var(--surface-2)}
+.top-sel svg{width:16px;height:16px;color:var(--muted)}
+.top-sel .caret{width:14px;height:14px}
+.center-sel{border-color:var(--line-strong)}
+.sidebar{background:var(--surface);border-right:1px solid var(--line);overflow-y:auto;padding:14px 12px 24px}
+.nav-search{margin-bottom:14px}
+.nav-search .input{width:100%}
+.nav-group{margin-bottom:6px}
+.nav-group-title{display:flex;justify-content:space-between;align-items:center;width:100%;border:0;background:none;padding:8px 8px;font-weight:600;font-size:12px;cursor:pointer;color:var(--text)}
+.nav-group-title svg{width:14px;height:14px;color:var(--faint);transition:transform .15s}
+.nav-group.closed .nav-group-title svg{transform:rotate(-90deg)}
+.nav-group.closed .nav-items{display:none}
+.nav-item{display:flex;align-items:center;gap:10px;width:100%;padding:7px 10px;margin:1px 0;border:0;border-radius:var(--r);background:none;cursor:pointer;color:var(--muted);text-align:left;position:relative}
+.nav-item svg{width:17px;height:17px;flex:none}
+.nav-item:hover{background:var(--surface-2);color:var(--text)}
+.nav-item.active{background:var(--accent-soft);color:var(--accent);font-weight:600}
+.nav-item.active::before{content:"";position:absolute;left:-12px;top:6px;bottom:6px;width:3px;border-radius:0 3px 3px 0;background:var(--brand)}
+.nav-item .badge{margin-left:auto}
+.main{overflow-y:auto;padding:22px 28px 48px;min-width:0}
+.crumbs{font-size:13px;color:var(--muted);margin-bottom:6px}
+.crumbs a{color:var(--muted);text-decoration:none}
+.crumbs a:hover{color:var(--accent);text-decoration:underline}
+.page-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:18px}
+.page-head h1{font-size:19px;line-height:1.25;margin:0;font-weight:700;letter-spacing:-.01em}
+.page-head p{margin:4px 0 0;color:var(--muted)}
+.tools{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+
+/* popovers */
+.pop{position:fixed;z-index:50;min-width:220px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);box-shadow:var(--shadow);padding:6px}
+.pop h4{margin:6px 10px 6px;font-size:12px;color:var(--muted);font-weight:500}
+.pop-item{display:flex;align-items:flex-start;gap:10px;width:100%;padding:8px 10px;border:0;border-radius:var(--r);background:none;text-align:left;cursor:pointer}
+.pop-item:hover{background:var(--surface-2)}
+.pop-item .chk{width:16px;flex:none;color:var(--brand)}
+.pop-item b{font-weight:600;display:block}
+.pop-item span.d{color:var(--muted);font-size:12px}
+.pop .search{padding:4px 4px 6px}
+.pop .search .input{width:100%}
+.pop-sep{height:1px;background:var(--line);margin:6px 4px}
+
+/* cards & kpi */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg)}
+.card-head{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;border-bottom:1px solid var(--line)}
+.card-head h2{font-size:14px;margin:0;font-weight:600}
+.kpis{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;margin-bottom:18px}
+.kpi{text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:14px 16px;cursor:pointer;display:flex;flex-direction:column;gap:4px;transition:border-color .15s}
+.kpi:hover{border-color:var(--brand)}
+.kpi .lbl{color:var(--muted);font-size:12.5px}
+.kpi .val{font-size:24px;font-weight:700;letter-spacing:-.02em;line-height:1.15}
+.kpi .sub{font-size:12px;color:var(--faint)}
+.kpi.alert .val{color:var(--danger)}
+.kpi.warnk .val{color:var(--warn)}
+.kpi .go{font-size:12px;color:var(--accent);font-weight:500;margin-top:4px}
+.grid-2{display:grid;grid-template-columns:1.2fr 1fr;gap:16px}
+.list-row{display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--line)}
+.list-row:last-child{border-bottom:0}
+.list-row .time{width:96px;flex:none;font-weight:600}
+.list-row .meta{color:var(--muted);font-size:12px}
+.list-row .grow{flex:1;min-width:0}
+.todo-row{width:100%;border:0;background:none;text-align:left;cursor:pointer}
+.todo-row:hover{background:var(--surface-2)}
+.todo-ico{width:32px;height:32px;border-radius:8px;display:grid;place-items:center;flex:none}
+.todo-ico svg{width:17px;height:17px}
+
+/* table */
+.filters{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+.fbtn{display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 10px;border-radius:var(--r);border:1px dashed var(--line-strong);background:var(--surface);cursor:pointer;font-weight:500}
+.fbtn.on{border-style:solid;border-color:var(--accent-line);background:var(--accent-soft);color:var(--accent)}
+.fbtn svg{width:14px;height:14px}
+.linkbtn{border:0;background:none;color:var(--accent);font-weight:500;cursor:pointer;padding:4px 6px}
+.table-wrap{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:860px}
+th{font-weight:600;font-size:12px;color:var(--muted);text-align:left;padding:10px 12px;background:var(--surface-2);border-bottom:1px solid var(--line);white-space:nowrap}
+td{padding:11px 12px;border-bottom:1px solid var(--line);vertical-align:middle}
+tbody tr{cursor:pointer}
+tbody tr:hover td{background:var(--surface-2)}
+tbody tr:last-child td{border-bottom:0}
+tr.sel td{background:var(--accent-soft)!important}
+.cell-name b{display:block;font-weight:600}
+.cell-name span{color:var(--muted);font-size:12px}
+td.r,th.r{text-align:right}
+.cbx{width:16px;height:16px;accent-color:var(--brand);cursor:pointer}
+.mini{display:flex;align-items:center;gap:8px}
+.mini-bar{width:96px;height:6px;border-radius:3px;background:var(--surface-2);overflow:hidden;border:1px solid var(--line)}
+.mini-bar i{display:block;height:100%;background:var(--accent)}
+.mini-bar.low i{background:var(--warn)}
+.mini .rem{font-weight:600;min-width:52px}
+.mini .rem.low{color:var(--warn)}
+.pager{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 4px;color:var(--muted);flex-wrap:wrap}
+.pager .pg{display:flex;gap:4px;align-items:center}
+.pg button{min-width:32px;height:30px;border-radius:var(--r);border:1px solid transparent;background:none;cursor:pointer}
+.pg button.on{background:var(--brand);color:var(--brand-ink);font-weight:600}
+.pg button:hover:not(.on):not([disabled]){background:var(--surface-2)}
+.pg button[disabled]{opacity:.4;cursor:not-allowed}
+.bulk{position:sticky;bottom:16px;margin:12px auto 0;display:flex;gap:10px;align-items:center;width:max-content;max-width:100%;padding:8px 10px 8px 16px;border-radius:999px;background:var(--text);color:var(--bg);box-shadow:var(--shadow);flex-wrap:wrap}
+.bulk .btn{background:transparent;color:var(--bg);border-color:rgba(255,255,255,.25);height:30px}
+:root[data-theme="dark"] .bulk .btn{border-color:rgba(0,0,0,.25)}
+.empty{padding:56px 16px;text-align:center}
+.empty svg{width:36px;height:36px;color:var(--faint)}
+.empty h3{margin:10px 0 4px;font-size:16px}
+.empty p{margin:0 0 14px;color:var(--muted)}
+
+/* enrollment detail */
+.detail-grid{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:16px;align-items:start}
+.person{display:flex;gap:14px;align-items:center}
+.avatar{width:48px;height:48px;border-radius:50%;background:var(--accent-soft);color:var(--accent);display:grid;place-items:center;font-weight:700;font-size:17px;flex:none}
+.strip-card{padding:18px 18px 16px}
+.strip-top{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;margin-bottom:14px}
+.big-rem{display:flex;align-items:baseline;gap:10px}
+.big-rem strong{font-size:38px;line-height:1;letter-spacing:-.03em}
+.big-rem span{color:var(--muted);max-width:220px;font-size:13px;line-height:1.35}
+.strip-stats{display:flex;gap:18px;flex-wrap:wrap}
+.strip-stats div{font-size:12.5px;color:var(--muted)}
+.strip-stats b{display:block;color:var(--text);font-size:15px}
+.strip{display:grid;grid-template-columns:repeat(auto-fill,minmax(26px,1fr));gap:4px}
+.cell{aspect-ratio:1;border-radius:4px;border:1.5px solid var(--line-strong);position:relative;cursor:default;background:var(--cell-empty)}
+.cell.attend{background:var(--cell-attend);border-color:var(--cell-attend)}
+.cell.excused{background:var(--cell-excused);border-color:var(--cell-excused)}
+.cell.absent{background:repeating-linear-gradient(135deg,var(--cell-absent) 0 3px,transparent 3px 6px);border-color:var(--cell-absent)}
+.cell.cancel{background:var(--cell-cancel);border-color:var(--cell-cancel);opacity:.6}
+.cell.next{border-color:var(--brand);border-width:2px;box-shadow:0 0 0 3px var(--brand-soft)}
+.cell.credit{border-style:dashed;border-color:var(--cell-makeup)}
+.cell:hover .tip{display:block}
+.tip{display:none;position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);background:var(--text);color:var(--bg);padding:5px 8px;border-radius:6px;font-size:12px;white-space:nowrap;z-index:5;pointer-events:none}
+.legend{display:flex;gap:14px;flex-wrap:wrap;margin-top:14px;font-size:12.5px;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend i{width:12px;height:12px;border-radius:3px;display:inline-block;border:1.5px solid var(--line-strong)}
+.money{padding:4px 16px 12px}
+.money-row{display:flex;justify-content:space-between;gap:10px;padding:9px 0;border-bottom:1px dashed var(--line)}
+.money-row:last-child{border-bottom:0}
+.money-row span{color:var(--muted)}
+.money-row b{font-weight:600}
+.money-row.hl b{color:var(--danger)}
+.money-row.ok b{color:var(--ok)}
+.ledger{list-style:none;margin:0;padding:6px 16px 10px}
+.ledger li{display:grid;grid-template-columns:96px 1fr auto;gap:12px;padding:11px 0;border-bottom:1px solid var(--line);align-items:start}
+.ledger li:last-child{border-bottom:0}
+.ledger .when{color:var(--muted);font-size:12.5px}
+.ledger .what b{font-weight:600}
+.ledger .what div{color:var(--muted);font-size:12.5px}
+.delta{font-weight:700;min-width:64px;text-align:right}
+.delta.plus{color:var(--ok)}
+.delta.minus{color:var(--text)}
+.delta.zero{color:var(--faint)}
+.actions-col{display:flex;flex-direction:column;gap:8px;padding:14px 16px}
+.actions-col .btn{justify-content:flex-start}
+.note{font-size:12.5px;color:var(--muted)}
+
+/* timetable */
+.tt{display:grid;grid-template-columns:72px repeat(7,minmax(130px,1fr));min-width:1000px}
+.tt-wrap{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg)}
+.tt .h{padding:10px 8px;font-weight:600;font-size:13px;border-bottom:1px solid var(--line);background:var(--surface-2);text-align:center}
+.tt .h small{display:block;color:var(--muted);font-weight:500}
+.tt .h.holiday{color:var(--danger)}
+.tt .slot{padding:8px;font-size:12.5px;color:var(--muted);border-bottom:1px solid var(--line);border-right:1px solid var(--line)}
+.tt .c{border-bottom:1px solid var(--line);border-right:1px solid var(--line);padding:6px;min-height:92px;display:flex;flex-direction:column;gap:6px}
+.tt .c.hol{background:repeating-linear-gradient(135deg,transparent 0 8px,var(--surface-2) 8px 16px)}
+.cls{border:1px solid var(--accent-line);border-left:3px solid var(--accent);background:var(--accent-soft);border-radius:6px;padding:6px 8px;text-align:left;cursor:pointer;width:100%}
+.cls:hover{filter:brightness(.97)}
+.cls b{display:block;font-size:12.5px}
+.cls span{display:block;font-size:11.5px;color:var(--muted)}
+.cls.under{border-left-color:var(--warn);background:var(--warn-soft);border-color:#E7C98A}
+:root[data-theme="dark"] .cls.under{border-color:#5a4520}
+.cls.cancelled{background:var(--surface-2);border-color:var(--line-strong);border-left-color:var(--faint);opacity:.75}
+.cls.cancelled b{text-decoration:line-through}
+.hol-label{font-size:12px;color:var(--danger);font-weight:500;padding:4px}
+
+/* attendance */
+.att-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;padding:14px 16px;border-bottom:1px solid var(--line)}
+.seg{display:inline-flex;border:1px solid var(--line-strong);border-radius:var(--r);overflow:hidden;background:var(--surface)}
+.seg button{border:0;background:none;padding:6px 10px;cursor:pointer;font-size:13px;font-weight:500;color:var(--muted);border-right:1px solid var(--line)}
+.seg button:last-child{border-right:0}
+.seg button:hover{background:var(--surface-2)}
+.seg button.on.p{background:var(--ok-soft);color:var(--ok)}
+.seg button.on.l{background:var(--accent-soft);color:var(--accent)}
+.seg button.on.e{background:var(--warn-soft);color:var(--warn)}
+.seg button.on.a{background:var(--danger-soft);color:var(--danger)}
+.att-row{display:grid;grid-template-columns:28px minmax(0,1fr) auto;gap:12px;align-items:center;padding:10px 16px;border-bottom:1px solid var(--line)}
+.att-row .idx{color:var(--faint)}
+.att-foot{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;padding:14px 16px;background:var(--surface-2);border-radius:0 0 var(--r-lg) var(--r-lg)}
+.lockline{display:flex;align-items:center;gap:6px;color:var(--muted);font-size:13px}
+.lockline svg{width:15px;height:15px}
+.flag{font-size:11.5px;color:var(--accent);background:var(--accent-soft);border-radius:4px;padding:1px 6px;margin-left:6px;font-weight:500}
+
+/* approvals */
+.md{display:grid;grid-template-columns:360px minmax(0,1fr);gap:16px;align-items:start}
+.tabs{max-width:100%;overflow-x:auto;display:inline-flex;border:1px solid var(--line-strong);border-radius:var(--r);overflow:hidden}
+.tabs button{flex:none;border:0;background:var(--surface);padding:7px 12px;cursor:pointer;display:flex;gap:8px;align-items:center;font-weight:500;color:var(--muted);border-right:1px solid var(--line)}
+.tabs button:last-child{border-right:0}
+.tabs button.on{background:var(--accent-soft);color:var(--accent)}
+.q-list{max-height:calc(100vh - 220px);overflow-y:auto}
+.q-item{display:block;width:100%;text-align:left;border:0;border-bottom:1px solid var(--line);background:none;padding:12px 14px 12px 16px;cursor:pointer;position:relative}
+.q-item:hover{background:var(--surface-2)}
+.q-item.on{background:var(--accent-soft)}
+.q-item.on::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--brand)}
+.q-item .t{display:flex;justify-content:space-between;gap:8px;font-weight:600}
+.q-item .s{color:var(--muted);font-size:12.5px;margin-top:2px}
+.q-type{font-size:11.5px;font-weight:600;color:var(--accent)}
+.kv{display:grid;grid-template-columns:180px 1fr;gap:8px 16px;padding:16px}
+.kv dt{color:var(--muted)}
+.kv dd{margin:0;font-weight:500}
+.calc{margin:0 16px 16px;border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.calc div{display:flex;justify-content:space-between;padding:9px 12px;border-bottom:1px solid var(--line)}
+.calc div:last-child{border-bottom:0;background:var(--surface-2);font-weight:700}
+.calc span{color:var(--muted)}
+.decision{padding:0 16px 16px}
+.err{color:var(--danger);font-size:12.5px;margin-top:6px}
+.kbd{display:inline-block;border:1px solid var(--line-strong);border-bottom-width:2px;border-radius:4px;padding:0 5px;font-size:11.5px;color:var(--muted)}
+.shortcut-line{color:var(--faint);font-size:12px;display:flex;gap:10px;flex-wrap:wrap;padding:10px 16px;border-top:1px solid var(--line)}
+
+/* modal, toast */
+.overlay{position:fixed;inset:0;background:rgba(10,14,22,.45);display:grid;place-items:center;z-index:100;padding:16px}
+.modal{width:min(520px,100%);background:var(--surface);border-radius:var(--r-lg);box-shadow:var(--shadow);max-height:90vh;overflow:auto}
+.modal-head{display:flex;justify-content:space-between;align-items:flex-start;padding:16px 18px;border-bottom:1px solid var(--line)}
+.modal-head h3{margin:0;font-size:15px}
+.modal-head p{margin:2px 0 0;color:var(--muted);font-size:13px}
+.modal-body{padding:16px 18px;display:flex;flex-direction:column;gap:14px}
+.modal-foot{display:flex;justify-content:flex-end;gap:8px;padding:14px 18px;border-top:1px solid var(--line)}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--text);color:var(--bg);padding:10px 16px;border-radius:999px;box-shadow:var(--shadow);z-index:200;display:flex;gap:8px;align-items:center;font-weight:500;animation:tin .2s ease-out}
+.toast svg{width:16px;height:16px;color:var(--ok)}
+@keyframes tin{from{opacity:0;transform:translate(-50%,8px)}to{opacity:1;transform:translate(-50%,0)}}
+
+/* login */
+.login{min-height:100vh;display:grid;grid-template-columns:1fr 1fr}
+.login-art{background:var(--brand);color:#fff;padding:48px;display:flex;flex-direction:column;justify-content:space-between;position:relative;overflow:hidden}
+:root[data-theme="dark"] .login-art{background:#18244A}
+.login-art h2{font-size:34px;line-height:1.15;margin:0;max-width:440px;letter-spacing:-.02em}
+.login-art p{opacity:.8;max-width:420px}
+.art-strip{display:grid;grid-template-columns:repeat(12,22px);gap:6px}
+.art-strip i{height:22px;border-radius:4px;border:1.5px solid rgba(255,255,255,.45)}
+.art-strip i.f{background:#fff;border-color:#fff}
+.art-strip i.x{background:repeating-linear-gradient(135deg,#F3B0AA 0 3px,transparent 3px 6px);border-color:#F3B0AA}
+.art-strip i.e{background:#F2C463;border-color:#F2C463}
+.login-form{display:grid;place-items:center;padding:32px;background:var(--surface)}
+.login-box{width:min(380px,100%);display:flex;flex-direction:column;gap:16px}
+.login-box h1{margin:0;font-size:24px}
+.pw{position:relative}
+.pw button{position:absolute;right:4px;top:50%;transform:translateY(-50%);height:28px}
+.demo-roles{display:flex;flex-wrap:wrap;gap:6px}
+.demo-roles button{border:1px solid var(--line-strong);background:var(--surface);border-radius:999px;padding:5px 11px;cursor:pointer;font-size:13px}
+.demo-roles button:hover{border-color:var(--brand);color:var(--brand)}
+.demo-note{border-top:1px solid var(--line);padding-top:14px;color:var(--muted);font-size:12.5px}
+
+/* responsive */
+@media (max-width:1180px){.kpis{grid-template-columns:repeat(3,minmax(0,1fr))}.grid-2,.detail-grid{grid-template-columns:1fr}.md{grid-template-columns:1fr}.q-list{max-height:none}}
+@media (max-width:900px){
+  .app{grid-template-columns:minmax(0,1fr)}
+  .sidebar{position:fixed;top:56px;left:0;bottom:0;width:272px;z-index:30;transform:translateX(-100%);transition:transform .2s;box-shadow:var(--shadow)}
+  .app.nav-open .sidebar{transform:none}
+  .menu-toggle{display:inline-flex}
+  .main{padding:18px 16px 40px}
+  .hide-sm{display:none!important}
+  .login{grid-template-columns:1fr}.login-art{display:none}
+  .search .input{width:100%}
+}
+@media (max-width:560px){.kpis{grid-template-columns:1fr 1fr}.kv{grid-template-columns:1fr}.topbar .logo>div:last-child{display:none}.topbar{gap:2px;padding:0 8px}.ledger li{grid-template-columns:1fr auto}.ledger .when{grid-column:1/-1}}
+
+/* ---------- forms, row menu, confirm ---------- */
+.pop.fixed{position:fixed}
+.pop-item svg.mi{width:16px;height:16px;flex:none;margin-top:1px}
+.faint-ico{width:16px;height:16px;color:var(--faint)}
+.row-act{width:30px;height:30px;border-radius:6px;border:0;background:none;cursor:pointer;color:var(--muted);display:inline-grid;place-items:center}
+.row-act:hover{background:var(--line);color:var(--text)}
+.row-act svg{width:18px;height:18px}
+.modal.wide{width:min(720px,100%)}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px 16px}
+.form-grid .full{grid-column:1/-1}
+.form-sec{grid-column:1/-1;font-weight:600;font-size:13px;color:var(--accent);padding-top:12px;margin-top:2px;border-top:1px solid var(--line)}
+.form-sec:first-child{border-top:0;padding-top:0;margin-top:0}
+.req{color:var(--danger)}
+.hint{font-size:12px;color:var(--faint)}
+select.input{appearance:none;-webkit-appearance:none;padding-right:32px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;background-size:14px;cursor:pointer}
+select.input:disabled,input.input:disabled{background-color:var(--surface-2);color:var(--muted);cursor:not-allowed}
+.days{display:flex;gap:6px;flex-wrap:wrap}
+.days button{min-width:46px;height:34px;border-radius:var(--r);border:1px solid var(--line-strong);background:var(--surface);cursor:pointer;font-weight:500}
+.days button.on{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.warnbox,.dangerbox{display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border-radius:var(--r);font-size:13.5px}
+.warnbox{background:var(--warn-soft);border:1px solid var(--warn)}
+.dangerbox{background:var(--danger-soft);border:1px solid var(--danger)}
+.warnbox>svg,.dangerbox>svg{width:18px;height:18px;flex:none;margin-top:1px}
+.warnbox>svg{color:var(--warn)} .dangerbox>svg{color:var(--danger)}
+.confirm-ico{width:40px;height:40px;border-radius:50%;background:var(--danger-soft);color:var(--danger);display:grid;place-items:center;flex:none}
+.confirm-ico svg{width:20px;height:20px}
+.btn-solid-danger{background:var(--danger);border-color:var(--danger);color:#fff}
+.btn-solid-danger:hover{background:var(--danger);filter:brightness(1.08)}
+.toast button{border:0;background:none;color:var(--brand);font-weight:600;cursor:pointer;padding:0 0 0 8px;margin-left:4px;border-left:1px solid rgba(127,127,127,.4)}
+.pg .gap{padding:0 4px;color:var(--faint)}
+tr.flash td{animation:flash 2.4s ease-out}
+@keyframes flash{0%,40%{background:var(--brand-soft)}100%{background:transparent}}
+.list-row.todo-row .time{text-align:left}
+@media (max-width:640px){.form-grid{grid-template-columns:1fr}}
+
+/* ---------- mobile: drawer, bottom sheets, card tables ---------- */
+.pop-item>svg{width:16px;height:16px;flex:none;margin-top:2px}
+.only-sm{display:none}
+.backdrop,.sheet-bg{display:none}
+@media (max-width:900px){
+  .backdrop{display:block;position:fixed;inset:56px 0 0 0;background:rgba(10,14,22,.45);z-index:25}
+  .only-sm{display:block}
+  .nav-item{padding:10px 10px}
+}
+@media (max-width:640px){
+  .sheet-bg{display:block;position:fixed;inset:0;background:rgba(10,14,22,.45);z-index:45}
+  .pop{left:0!important;right:0!important;top:auto!important;bottom:0;width:auto!important;min-width:0!important;max-height:78vh;overflow-y:auto;border-radius:16px 16px 0 0;padding:6px 8px calc(14px + env(safe-area-inset-bottom));animation:sheet .18s ease-out}
+  .pop::before{content:"";display:block;width:40px;height:4px;border-radius:2px;background:var(--line-strong);margin:6px auto 6px}
+  .pop h4{font-size:13px;margin:8px 12px}
+  .pop-item{min-height:48px;align-items:center;padding:10px 12px}
+  .pop-item .chk{width:18px}
+  @keyframes sheet{from{transform:translateY(24px);opacity:.6}to{transform:none;opacity:1}}
+  /* bảng thành thẻ */
+  .table-wrap{overflow:visible;background:transparent;border:0}
+  table.cards{min-width:0;border-collapse:separate}
+  table.cards thead{display:none}
+  table.cards tbody{display:flex;flex-direction:column;gap:10px}
+  table.cards tr{display:grid;grid-template-columns:28px minmax(0,1fr) 36px;column-gap:10px;row-gap:6px;padding:12px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);position:relative}
+  table.cards.nocbx tr{grid-template-columns:minmax(0,1fr) 36px}
+  table.cards td{grid-column:2;border:0!important;padding:0;text-align:left!important;background:transparent!important}
+  table.cards.nocbx td{grid-column:1}
+  table.cards td.c-cbx{grid-column:1;grid-row:1 / span 8;padding-top:2px}
+  table.cards td.c-more{grid-column:3;grid-row:1;justify-self:end}
+  table.cards.nocbx td.c-more{grid-column:2}
+  table.cards td[data-label]{display:flex;justify-content:space-between;align-items:center;gap:12px;font-size:13.5px}
+  table.cards td[data-label]::before{content:attr(data-label);color:var(--muted);font-size:12.5px;flex:none}
+  table.cards td[data-label] .tag-inline{display:inline;margin-left:6px}
+  table.cards td.cell-name{padding-bottom:6px!important;border-bottom:1px dashed var(--line)!important}
+  table.cards td:last-child:not(.c-more) .btn{width:100%;justify-content:center;margin-top:4px}
+  tr.sel{outline:2px solid var(--accent)}
+  .pager{justify-content:center}
+  .pager>div:first-child{width:100%;text-align:center}
+  /* điểm danh */
+  .att-row{grid-template-columns:22px minmax(0,1fr);row-gap:8px}
+  .att-row .seg{grid-column:1/-1;display:flex}
+  .att-row .seg button{flex:1;padding:9px 2px;font-size:12px;line-height:1.2}
+  .att-foot .tools{width:100%}
+  .att-foot .tools .btn{width:100%;justify-content:center}
+  /* danh sách hôm nay */
+  .list-row .time{width:48px}
+  .list-row{flex-wrap:wrap;row-gap:6px}
+  /* modal thành bảng trượt */
+  .overlay{align-items:end;padding:0}
+  .modal,.modal.wide{width:100%;max-height:94vh;border-radius:16px 16px 0 0}
+  .modal-foot{position:sticky;bottom:0;background:var(--surface);padding-bottom:calc(14px + env(safe-area-inset-bottom))}
+  .modal-foot .btn{flex:1;justify-content:center}
+  .modal-head{position:sticky;top:0;background:var(--surface);z-index:1}
+  .input{font-size:16px}
+  .search .input{font-size:16px}
+  .page-head .tools{width:100%}
+  .page-head .tools .search{flex:1 1 100%}
+  .tabs{width:100%}
+  .bulk{border-radius:14px;justify-content:center}
+}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script>
+/* ================= icons ================= */
+const I = {
+  home:'<path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/>',
+  users:'<path d="M16 20v-1.5A3.5 3.5 0 0 0 12.5 15h-5A3.5 3.5 0 0 0 4 18.5V20"/><circle cx="10" cy="8" r="3.5"/><path d="M20 20v-1.5a3.5 3.5 0 0 0-2.5-3.35M15.5 4.6a3.5 3.5 0 0 1 0 6.8"/>',
+  userPlus:'<circle cx="9" cy="8" r="3.5"/><path d="M3 20v-1.5A3.5 3.5 0 0 1 6.5 15h5a3.5 3.5 0 0 1 3.5 3.5V20M19 8v6M16 11h6"/>',
+  cal:'<rect x="3" y="4.5" width="18" height="16" rx="2"/><path d="M3 9.5h18M8 3v3M16 3v3"/>',
+  check:'<rect x="3.5" y="3.5" width="17" height="17" rx="3"/><path d="m8 12 3 3 5-6"/>',
+  wallet:'<path d="M4 7.5A2.5 2.5 0 0 1 6.5 5H19v4"/><path d="M4 7.5V18a2 2 0 0 0 2 2h14V9H6.5A2.5 2.5 0 0 1 4 7.5Z"/><circle cx="16" cy="14.5" r="1"/>',
+  inbox:'<path d="M3 13h5l1.5 3h5L16 13h5"/><path d="M5.5 5h13L21 13v6a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-6z"/>',
+  chart:'<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>',
+  search:'<circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/>',
+  bell:'<path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 20a2 2 0 0 0 4 0"/>',
+  sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>',
+  moon:'<path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5Z"/>',
+  monitor:'<rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/>',
+  down:'<path d="m6 9 6 6 6-6"/>',
+  plus:'<path d="M12 5v14M5 12h14"/>',
+  x:'<path d="M18 6 6 18M6 6l12 12"/>',
+  lock:'<rect x="4.5" y="10.5" width="15" height="10" rx="2"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/>',
+  menu:'<path d="M4 6h16M4 12h16M4 18h16"/>',
+  out:'<path d="M15 4h4a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1h-4M10 16l-4-4 4-4M6 12h10"/>',
+  swap:'<path d="M7 4 3 8l4 4M3 8h14M17 20l4-4-4-4M21 16H7"/>',
+  building:'<path d="M4 21V5a1 1 0 0 1 1-1h9a1 1 0 0 1 1 1v16M15 9h4a1 1 0 0 1 1 1v11M2 21h20M8 8h3M8 12h3M8 16h3"/>',
+  ok:'<path d="m5 12.5 4.5 4.5L19 7.5"/>',
+  alert:'<path d="M12 3 2.5 20h19z"/><path d="M12 10v4M12 17h.01"/>',
+  clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+  refund:'<path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5M12 8v8M9.5 10.5c0-1 1-1.5 2.5-1.5s2.5.6 2.5 1.6c0 2.4-5 1.2-5 3.6 0 1 1.1 1.8 2.5 1.8s2.5-.6 2.5-1.6"/>',
+  pause:'<rect x="5" y="4" width="4.5" height="16" rx="1"/><rect x="14.5" y="4" width="4.5" height="16" rx="1"/>',
+  move:'<path d="M5 12h14M13 6l6 6-6 6"/>',
+  gift:'<rect x="3" y="8" width="18" height="5" rx="1"/><path d="M5 13v7h14v-7M12 8v12M12 8c-1.5-3-5-3-5-1s3 1 5 1c2 0 5 1 5-1s-3.5-2-5 1"/>',
+  eye:'<path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/>',
+  filter:'<path d="M4 5h16l-6 7.5V19l-4 1.5v-8z"/>',
+  dl:'<path d="M12 4v11M7 10l5 5 5-5M4 20h16"/>',
+  send:'<path d="M21 3 10 14M21 3l-7 18-4-7-7-4z"/>',
+  layers:'<path d="m12 3 9 5-9 5-9-5z"/><path d="m3 13 9 5 9-5"/>',
+  edit:'<path d="M4 20h4L19 9l-4-4L4 16z"/><path d="m13.5 6.5 4 4"/>',
+  trash:'<path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/>',
+  more:'<circle cx="5" cy="12" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="19" cy="12" r="1.3"/>'
+};
+const ic = (n, cls='') => `<svg class="${cls}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${I[n]}</svg>`;
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const vnd = n => n.toLocaleString('vi-VN') + ' đ';
+const fmt = n => n.toLocaleString('vi-VN');
+
+/* ================= data ================= */
+const TODAY = '2026-10-10';           // thứ Bảy
+const NOW_TIME = '10:00';
+const HOLIDAYS = {'2026-09-01':'Nghỉ lễ Quốc khánh','2026-09-02':'Quốc khánh 2/9','2026-10-16':'Tập huấn giáo viên toàn hệ thống'};
+const CENTERS = [
+  {id:'cg', name:'Cơ sở Cầu Giấy'}, {id:'hbt', name:'Cơ sở Hai Bà Trưng'},
+  {id:'lb', name:'Cơ sở Long Biên'}, {id:'hd', name:'Cơ sở Hà Đông'}
+];
+const centerName = id => (CENTERS.find(c => c.id === id) || {name:'Tất cả cơ sở'}).name;
+const centerShort = id => centerName(id).replace('Cơ sở ','');
+const ROLES = {
+  admin:{name:'Quản trị tổ chức', desc:'Xem cả 4 cơ sở, cấu hình chính sách, duyệt cấp cao', user:'Nguyễn Hoàng Lan', handle:'lan.nh'},
+  manager:{name:'Quản lý cơ sở', desc:'Vận hành một cơ sở, duyệt hoàn phí và ưu đãi', user:'Trần Minh Đức', handle:'duc.tm'},
+  academic:{name:'Học vụ', desc:'Xếp lớp, lịch học, học bù, theo dõi điểm danh', user:'Phạm Thu Hà', handle:'ha.pt'},
+  teacher:{name:'Giáo viên', desc:'Điểm danh, nhận xét lớp mình phụ trách', user:'Lê Quang Vinh', handle:'vinh.lq'},
+  accountant:{name:'Kế toán', desc:'Thu tiền, công nợ, chi hoàn phí, đối soát', user:'Đỗ Thanh Mai', handle:'mai.dt'},
+  frontdesk:{name:'Tuyển sinh / Lễ tân', desc:'Ghi danh, thu tiền tại quầy, tạo yêu cầu', user:'Vũ Ngọc Ánh', handle:'anh.vn'}
+};
+/* quyền thao tác */
+const P = {
+  editStudent: 'admin manager academic frontdesk',
+  addStudent: 'admin manager frontdesk',
+  deleteStudent: 'admin manager',
+  editClass: 'admin manager academic',
+  money: 'admin manager accountant frontdesk'
+};
+const COURSE_INFO = {
+  'Starters':{n:30,u:250000,code:'STA'}, 'Movers':{n:32,u:250000,code:'MOV'}, 'Flyers':{n:32,u:260000,code:'FLY'},
+  'KET':{n:36,u:270000,code:'KET'}, 'PET':{n:36,u:270000,code:'PET'}, 'IELTS 5.0':{n:40,u:300000,code:'IE5'},
+  'IELTS 6.5':{n:40,u:320000,code:'IE6'}, 'Giao tiếp B1':{n:24,u:280000,code:'GT-B1'}
+};
+const COURSES = Object.keys(COURSE_INFO);
+const DISCOUNTS = [
+  {id:'none', label:'Không áp dụng', pct:0}, {id:'sibling', label:'Anh chị em (10%)', pct:10},
+  {id:'early', label:'Đóng sớm (15%)', pct:15}, {id:'returning', label:'Học viên cũ (5%)', pct:5}
+];
+const ROOMS = {cg:['P101','P102','P104','P201','P203','Online'], hbt:['P301','P302','P303','Online'], lb:['L101','L102','L103','Online'], hd:['H201','H202','H203','Online']};
+const TEACHERS = {
+  cg:['Lê Quang Vinh','Hannah Price','Nguyễn Thùy Dương','Daniel Brooks'],
+  hbt:['Trần Mai Phương','Oliver Grant','Nguyễn Hải Yến','Lưu Đức Thắng'],
+  lb:['Phùng Thị Lan','Sophie Turner','Đào Minh Tâm'],
+  hd:['Lê Quang Vinh','Mark Wilson','Bạch Thu Hà','Kim Ngọc Diệp']
+};
+const TIMES = ['08:00','09:45','14:00','17:45','19:30'];
+const DAY_LABEL = {2:'T2',3:'T3',4:'T4',5:'T5',6:'T6',7:'T7',8:'CN'};
+const STATUS = {
+  active:{label:'Đang học', cls:'s-active'}, pending:{label:'Chờ xếp lớp', cls:'s-pending'},
+  hold:{label:'Bảo lưu', cls:'s-hold'}, stop:{label:'Ngừng học', cls:'s-stop'}, done:{label:'Hoàn thành', cls:'s-done'}
+};
+const CLASS_STATUS = {running:{label:'Đang học', cls:'s-active'}, upcoming:{label:'Sắp khai giảng', cls:'s-pending'}, ended:{label:'Đã kết thúc', cls:'s-done'}};
+
+/* ---- ngày tháng ---- */
+const toD = iso => new Date(iso + 'T00:00:00Z');
+const isoOf = d => d.toISOString().slice(0,10);
+const dayNum = d => { const w = d.getUTCDay(); return w === 0 ? 8 : w + 1; };
+const vnDate = iso => iso ? iso.slice(8,10) + '/' + iso.slice(5,7) + '/' + iso.slice(0,4) : '';
+function sessionDates(start, days, count){
+  const out = []; let skipped = 0;
+  if (!start || !days.length) return {dates:out, skipped};
+  const d = toD(start);
+  for (let guard = 0; out.length < count && guard < 800; guard++){
+    const iso = isoOf(d);
+    if (days.includes(dayNum(d))){ if (HOLIDAYS[iso]) skipped++; else out.push(iso); }
+    d.setUTCDate(d.getUTCDate() + 1);
+  }
+  return {dates:out, skipped};
+}
+
+/* ---- sinh dữ liệu mẫu có hạt giống cố định ---- */
+function rng(seed){ return () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+const R = rng(20261010);
+const pick = a => a[Math.floor(R() * a.length)];
+const rint = (a, b) => a + Math.floor(R() * (b - a + 1));
+const HO = ['Nguyễn','Trần','Lê','Phạm','Hoàng','Huỳnh','Phan','Vũ','Võ','Đặng','Bùi','Đỗ','Hồ','Ngô','Dương','Lý','Trịnh','Đinh','Mai','Lâm','Tạ','Cao','Hà','Chu','Tô','Kiều','Lương'];
+const DEM_M = ['Minh','Gia','Đức','Quang','Tuấn','Hoàng','Bảo','Anh','Nhật','Thành','Khánh','Hữu','Đăng','Trung'];
+const DEM_F = ['Thị','Ngọc','Thu','Khánh','Bảo','Phương','Minh','Gia','Hà','Thảo','Mai','Diệu','An','Tú'];
+const TEN_M = ['Khang','Huy','Nam','Long','Phúc','Kiệt','Bảo','Minh','Đạt','Quân','Hưng','Sơn','Tùng','Khoa','Việt','Dũng','An','Lâm','Hiếu','Trí','Duy','Phong'];
+const TEN_F = ['Linh','Ngọc','Anh','Vy','My','Hân','Châu','Thư','Nhi','Trang','Hà','Vân','Yến','Ly','Uyên','Hương','Quỳnh','Tâm','Giang','Nhung','Diệp','Thảo'];
+const genName = () => R() < .5 ? `${pick(HO)} ${pick(DEM_M)} ${pick(TEN_M)}` : `${pick(HO)} ${pick(DEM_F)} ${pick(TEN_F)}`;
+const genParent = () => R() < .65 ? `Chị ${pick(HO)} ${pick(DEM_F)} ${pick(TEN_F)}` : `Anh ${pick(HO)} ${pick(DEM_M)} ${pick(TEN_M)}`;
+const genPhone = () => '09' + rint(0,9) + String(rint(0,9999999)).padStart(7,'0');
+const maskPhone = p => p ? p.slice(0,4) + ' ••• ' + p.slice(-3) : '';
+const genDob = course => { const age = {Starters:7,Movers:8,Flyers:10,KET:12,PET:14,'IELTS 5.0':16,'IELTS 6.5':17,'Giao tiếp B1':22}[course] || 12; return `${2026 - age - rint(0,1)}-${String(rint(1,12)).padStart(2,'0')}-${String(rint(1,28)).padStart(2,'0')}`; };
+
+/* ---- lớp học ---- */
+const C = (center, code, course, days, time, room, teacher, max, start, target) => ({center, code, course, days, time, room, teacher, min:6, max, start, target});
+let CLASSES = [
+  C('cg','FLY-1','Flyers',[2,4],'17:45','P102','Lê Quang Vinh',14,'2026-06-22',11),
+  C('cg','STA-4','Starters',[2,4],'17:45','P104','Hannah Price',12,'2026-07-06',9),
+  C('cg','IE5-1','IELTS 5.0',[2,4],'19:30','P203','Nguyễn Thùy Dương',16,'2026-06-03',10),
+  C('cg','KET-2','KET',[2,4],'19:30','P101','Daniel Brooks',12,'2026-06-15',5),
+  C('cg','PET-2','PET',[3,5],'19:30','P201','Lê Quang Vinh',15,'2026-07-14',13),
+  C('cg','MOV-3','Movers',[3,5],'17:45','P102','Hannah Price',14,'2026-08-11',12),
+  C('cg','STA-2','Starters',[7],'08:00','P104','Hannah Price',12,'2026-09-05',8),
+  C('cg','GT-B1C','Giao tiếp B1',[7],'09:45','Online','Daniel Brooks',10,'2026-09-12',4),
+  C('cg','IE6-2','IELTS 6.5',[7,8],'14:00','P203','Nguyễn Thùy Dương',16,'2026-08-01',14),
+  C('cg','PET-3','PET',[3,5],'17:45','P201','Daniel Brooks',15,'2026-10-20',3),
+  C('cg','MOV-0','Movers',[3,5],'17:45','P102','Hannah Price',14,'2026-01-06',0),
+  C('hbt','KET-0','KET',[2,4],'17:45','P303','Oliver Grant',12,'2026-01-05',0),
+  C('lb','STA-0','Starters',[7],'08:00','L103','Đào Minh Tâm',12,'2025-11-01',0),
+  C('hd','FLY-0','Flyers',[2,4],'17:45','H202','Mark Wilson',14,'2026-01-05',0),
+  C('hbt','IE5-3','IELTS 5.0',[2,4],'19:30','P301','Trần Mai Phương',16,'2026-07-13',12),
+  C('hbt','IE6-1','IELTS 6.5',[3,5],'19:30','P301','Oliver Grant',16,'2026-05-12',13),
+  C('hbt','MOV-1','Movers',[2,4],'17:45','P302','Nguyễn Hải Yến',14,'2026-09-07',11),
+  C('hbt','KET-3','KET',[3,5],'17:45','P303','Oliver Grant',12,'2026-08-04',10),
+  C('hbt','FLY-3','Flyers',[7,8],'08:00','P302','Nguyễn Hải Yến',14,'2026-07-04',12),
+  C('hbt','STA-1','Starters',[7],'09:45','P303','Lưu Đức Thắng',12,'2026-08-29',9),
+  C('lb','MOV-2','Movers',[2,4],'17:45','L101','Phùng Thị Lan',14,'2026-06-15',12),
+  C('lb','GT-B1','Giao tiếp B1',[3,5],'19:30','L102','Sophie Turner',10,'2026-07-14',7),
+  C('lb','STA-3','Starters',[3,5],'17:45','L103','Đào Minh Tâm',12,'2026-08-18',10),
+  C('lb','PET-4','PET',[2,4],'19:30','L102','Sophie Turner',15,'2026-07-27',11),
+  C('lb','FLY-4','Flyers',[7],'08:00','L101','Phùng Thị Lan',14,'2026-09-12',9),
+  C('hd','KET-1','KET',[2,4],'19:30','H201','Lê Quang Vinh',12,'2026-07-06',10),
+  C('hd','FLY-2','Flyers',[3,5],'17:45','H202','Mark Wilson',14,'2026-05-19',12),
+  C('hd','PET-1','PET',[7,8],'09:45','H201','Lê Quang Vinh',15,'2026-06-06',12),
+  C('hd','IE5-2','IELTS 5.0',[3,5],'19:30','H203','Bạch Thu Hà',16,'2026-08-04',11),
+  C('hd','MOV-4','Movers',[2,4],'17:45','H202','Kim Ngọc Diệp',14,'2026-09-07',10),
+  C('hd','STA-5','Starters',[7],'14:00','H202','Kim Ngọc Diệp',12,'2026-08-22',8)
+];
+function classMeta(c){
+  const n = COURSE_INFO[c.course].n;
+  const {dates, skipped} = sessionDates(c.start, c.days, n);
+  const held = dates.filter(d => d < TODAY).length;
+  const end = dates[dates.length - 1];
+  const status = c.start > TODAY ? 'upcoming' : (end < TODAY ? 'ended' : 'running');
+  const next = dates.find(d => d >= TODAY);
+  return {dates, skipped, held, end, status, next, n};
+}
+const findClass = (center, code) => CLASSES.find(c => c.center === center && c.code === code);
+const enrolledIn = c => STUDENTS.filter(s => s.center === c.center && s.cls === c.code && (s.status === 'active' || s.status === 'hold')).length;
+const CANCELLED = {'cg|KET-2|2026-10-14':'GV nghỉ, dời sang T7 17/10 08:00'};
+
+/* ---- học viên ---- */
+const RAW = [
+ ['Nguyễn Minh Khang','PET','PET-2','cg',36,25,1,'active',2720000,'0912 ••• 418'],
+ ['Trần Bảo Ngọc','Flyers','FLY-1','cg',32,30,0,'active',0,'0987 ••• 102'],
+ ['Lê Gia Huy','IELTS 5.0','IE5-3','hbt',40,12,0,'active',0,'0903 ••• 775'],
+ ['Phạm Khánh Linh','Movers','MOV-2','lb',32,29,2,'active',1500000,'0938 ••• 260'],
+ ['Hoàng Đức Anh','KET','','hd',36,0,0,'pending',0,'0977 ••• 931'],
+ ['Vũ Thảo My','Starters','STA-4','cg',30,14,0,'hold',0,'0916 ••• 544'],
+ ['Đặng Quốc Bảo','IELTS 6.5','IE6-1','hbt',40,38,0,'active',0,'0909 ••• 318'],
+ ['Bùi Ngọc Hân','PET','PET-2','cg',36,24,0,'active',0,'0868 ••• 090'],
+ ['Đỗ Minh Châu','Giao tiếp B1','GT-B1','lb',24,24,0,'done',0,'0934 ••• 671'],
+ ['Ngô Tuấn Kiệt','Flyers','FLY-2','hd',32,31,0,'active',3200000,'0975 ••• 482'],
+ ['Phan Hà Vy','Movers','MOV-1','hbt',32,8,0,'active',0,'0961 ••• 207'],
+ ['Trịnh Gia Bảo','KET','KET-2','cg',36,33,1,'active',0,'0918 ••• 836'],
+ ['Mai Phương Anh','IELTS 5.0','IE5-3','hbt',40,20,0,'stop',0,'0902 ••• 149'],
+ ['Lý Thành Nam','Starters','STA-3','lb',30,4,0,'active',0,'0947 ••• 553'],
+ ['Cao Khánh Vân','PET','PET-1','hd',36,34,0,'active',900000,'0989 ••• 760'],
+ ['Hồ Nhật Minh','Flyers','FLY-1','cg',32,18,0,'active',0,'0936 ••• 384'],
+ ['Dương Bích Ngọc','Giao tiếp B1','GT-B1','lb',24,10,0,'hold',0,'0914 ••• 925'],
+ ['Tạ Quang Huy','IELTS 6.5','IE6-1','hbt',40,30,0,'active',0,'0983 ••• 611'],
+ ['Lâm Tú Anh','Movers','','lb',32,0,0,'pending',0,'0966 ••• 738'],
+ ['Kiều Minh Thư','KET','KET-1','hd',36,15,0,'active',4100000,'0905 ••• 192'],
+ ['Nghiêm Đức Long','Starters','STA-4','cg',30,28,0,'active',0,'0931 ••• 447'],
+ ['Quách An Nhiên','PET','PET-1','hd',36,9,0,'active',0,'0972 ••• 853'],
+ ['Tôn Thất Phúc','IELTS 5.0','IE5-1','cg',40,36,1,'active',0,'0919 ••• 286'],
+ ['Võ Hồng Nhung','Flyers','FLY-2','hd',32,32,0,'done',0,'0988 ••• 504']
+];
+let seq = 1040;
+const nextId = () => 'HV' + String(seq++).padStart(5,'0');
+let STUDENTS = RAW.map(r => ({
+  id:nextId(), name:r[0], course:r[1], cls:r[2], center:r[3], total:r[4], used:r[5], credit:r[6], status:r[7], debt:r[8],
+  phone:r[9].replace(' ••• ', String(rint(100,999))).replace(' ',''), parent:genParent(), dob:genDob(r[1]), discount:'none', note:'', created:'2026-06-01'
+}));
+STUDENTS.find(s => s.name === 'Nguyễn Minh Khang').parent = 'Chị Nguyễn Thu Trang';
+/* lấp đầy các lớp theo sĩ số mục tiêu */
+CLASSES.forEach(c => {
+  const m = classMeta(c);
+  const have = STUDENTS.filter(s => s.center === c.center && s.cls === c.code && (s.status === 'active' || s.status === 'hold')).length;
+  for (let i = have; i < c.target; i++){
+    const used = m.status === 'upcoming' ? 0 : Math.max(0, m.held - rint(0,1));
+    const st = R() < .07 ? 'hold' : 'active';
+    STUDENTS.push({id:nextId(), name:genName(), course:c.course, cls:c.code, center:c.center, total:m.n, used: st === 'hold' ? Math.max(0, used - rint(2,6)) : used,
+      credit: R() < .12 ? 1 : 0, status:st, debt: R() < .14 ? pick([900000,1500000,2000000,2720000,3200000]) : 0,
+      phone:genPhone(), parent:genParent(), dob:genDob(c.course), discount: R() < .3 ? pick(['sibling','early','returning']) : 'none', note:'', created:c.start});
+  }
+});
+/* mỗi cơ sở thêm học viên chờ xếp lớp, đã hoàn thành, đã ngừng */
+CENTERS.forEach(ct => {
+  const cls = CLASSES.filter(c => c.center === ct.id);
+  for (let i = 0; i < 4; i++){ const course = pick(COURSES); const paidAll = i < 2;
+    STUDENTS.push({id:nextId(), name:genName(), course, cls:'', center:ct.id, total:COURSE_INFO[course].n, used:0, credit:0, status:'pending',
+      debt: paidAll ? 0 : Math.round(COURSE_INFO[course].n * COURSE_INFO[course].u), phone:genPhone(), parent:genParent(), dob:genDob(course), discount:'none', note:'', created:'2026-10-0' + rint(1,9), unpaid: !paidAll}); }
+  const ended = cls.find(c => classMeta(c).status === 'ended');
+  for (let i = 0; i < 6; i++){ const c = ended;
+    STUDENTS.push({id:nextId(), name:genName(), course:c.course, cls:c.code, center:ct.id, total:COURSE_INFO[c.course].n, used:COURSE_INFO[c.course].n, credit:0, status:'done', debt:0, phone:genPhone(), parent:genParent(), dob:genDob(c.course), discount:'none', note:'', created:'2026-01-05'}); }
+  for (let i = 0; i < 3; i++){ const c = pick(cls); const n = COURSE_INFO[c.course].n;
+    STUDENTS.push({id:nextId(), name:genName(), course:c.course, cls:c.code, center:ct.id, total:n, used:rint(4, n - 6), credit:0, status:'stop', debt:0, phone:genPhone(), parent:genParent(), dob:genDob(c.course), discount:'none', note:'', created:'2026-04-10'}); }
+});
+const remaining = s => s.total - s.used + s.credit;
+function money(s){
+  const info = COURSE_INFO[s.course];
+  const pct = (DISCOUNTS.find(d => d.id === s.discount) || DISCOUNTS[0]).pct;
+  const gross = s.total * info.u;
+  const fee = Math.round(gross * (100 - pct) / 100);
+  const unit = Math.round(fee / s.total);
+  const paid = s.unpaid ? fee - s.debt : (s.paid !== undefined ? s.paid : fee - s.debt);
+  return {gross, pct, fee, unit, paid, earned: unit * s.used};
+}
+
+let APPROVALS = [
+ {id:'YC-2041', type:'Hoàn phí', student:'Hồ Nhật Minh', center:'cg', by:'Vũ Ngọc Ánh', at:'09:12 10/10/2026', status:'wait',
+  reason:'Gia đình chuyển vào TP.HCM từ 15/10, không thể tiếp tục học.', policy:'Chính sách hoàn phí v3 (hiệu lực 01/06/2026)',
+  calc:[['Số buổi còn lại','14 buổi'],['Đơn giá thực trả','260.000 đ / buổi'],['Giá trị buổi còn lại','3.640.000 đ'],['Thu hồi ưu đãi','0 đ'],['Phí xử lý 10%','− 364.000 đ'],['Số tiền hoàn','3.276.000 đ']]},
+ {id:'YC-2040', type:'Ưu đãi vượt mức', student:'Hoàng Đức Anh', center:'hd', by:'Vũ Ngọc Ánh', at:'16:40 09/10/2026', status:'wait',
+  reason:'Anh trai đang học IELTS tại cơ sở; xin cộng dồn ưu đãi anh chị em 10% và đóng sớm 15%.', policy:'Trần ưu đãi cơ sở: 20%',
+  calc:[['Học phí KET (36 buổi)','9.720.000 đ'],['Anh chị em','− 10%'],['Đóng sớm','− 15%'],['Tổng ưu đãi đề xuất','25% (vượt trần 5%)'],['Học phí sau ưu đãi','7.290.000 đ']]},
+ {id:'YC-2038', type:'Mở khóa điểm danh', student:'Lớp PET-2 · buổi 06/10', center:'cg', by:'Lê Quang Vinh', at:'08:05 09/10/2026', status:'wait',
+  reason:'Mất điện buổi 06/10, điểm danh trên giấy. Cần nhập lại cho 3 học viên.', policy:'Điểm danh tự khóa sau 48 giờ',
+  calc:[['Buổi','Thứ Ba 06/10/2026, 19:30'],['Khóa lúc','19:30 08/10/2026'],['Học viên bị ảnh hưởng','3'],['Ảnh hưởng thù lao GV','Không']]},
+ {id:'YC-2035', type:'Tặng buổi', student:'Trịnh Gia Bảo', center:'cg', by:'Phạm Thu Hà', at:'14:22 08/10/2026', status:'wait',
+  reason:'Đền bù 2 buổi do GV nghỉ đột xuất không xếp được lớp bù trong tuần.', policy:'Tặng buổi tối đa 3 buổi / ghi danh',
+  calc:[['Số buổi tặng','+ 2 buổi'],['Giá trị quy đổi','0 đ (không ghi nhận doanh thu)'],['Số buổi còn lại sau tặng','6 buổi']]},
+ {id:'YC-2031', type:'Hoàn phí', student:'Đỗ Minh Châu', center:'lb', by:'Vũ Ngọc Ánh', at:'10:00 06/10/2026', status:'back',
+  reason:'Xin hoàn phí giáo trình chưa dùng.', policy:'Chính sách hoàn phí v3', feedback:'Giáo trình đã phát kèm khóa, không thuộc diện hoàn. Đề nghị tư vấn lại cho phụ huynh.',
+  calc:[['Phí giáo trình','450.000 đ'],['Trạng thái giáo trình','Đã nhận 01/08/2026'],['Số tiền đề nghị','450.000 đ']]},
+ {id:'YC-2027', type:'Tặng buổi', student:'Trần Bảo Ngọc', center:'cg', by:'Phạm Thu Hà', at:'09:30 03/10/2026', status:'done',
+  reason:'Đền bù 1 buổi do phòng học hỏng điều hòa, lớp dừng giữa giờ.', policy:'Tặng buổi tối đa 3 buổi / ghi danh',
+  calc:[['Số buổi tặng','+ 1 buổi']]}
+];
+
+/* ================= state ================= */
+const store = (k, v) => { try { if (v === undefined) return localStorage.getItem(k); localStorage.setItem(k, v); } catch(e) { return null; } };
+const S = {
+  logged:true /* Tạm tắt màn hình đăng nhập: vào thẳng ứng dụng. Đổi lại false để bật */, role:'manager', center:'cg', theme: store('ecms-theme') || 'system',
+  route:'dashboard', pop:null, navOpen:false, closedGroups:{}, menu:null,
+  q:'', fStatus:[], fCourse:[], fLow:false, page:1, size:10, selected:new Set(),
+  cq:'', cStatus:'all', cpage:1,
+  detailId:'HV01040', apprTab:'wait', apprSel:null, apprErr:'', apprNote:'',
+  attClass:{center:'cg', code:'PET-2'}, att:{}, modal:null, form:null, toast:null
+};
+
+/* ================= theme ================= */
+const mq = window.matchMedia('(prefers-color-scheme: dark)');
+function applyTheme(){
+  const dark = S.theme === 'dark' || (S.theme === 'system' && mq.matches);
+  document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+}
+mq.addEventListener && mq.addEventListener('change', () => { applyTheme(); });
+applyTheme();
+
+/* ================= navigation by role ================= */
+const NAV = [
+  {group:'Tổng quan', items:[{id:'dashboard', label:'Bảng điều khiển', icon:'home', roles:'*'}]},
+  {group:'Học viên', items:[
+    {id:'students', label:'Danh sách học viên', icon:'users', roles:'admin manager academic accountant frontdesk'},
+    {id:'students', label:'Học viên lớp tôi', icon:'users', roles:'teacher'},
+    {id:'enroll', label:'Ghi danh mới', icon:'userPlus', roles:P.addStudent}]},
+  {group:'Lớp & lịch', items:[
+    {id:'classes', label:'Danh sách lớp', icon:'layers', roles:'admin manager academic frontdesk'},
+    {id:'schedule', label:'Thời khóa biểu', icon:'cal', roles:'*'},
+    {id:'attendance', label:'Điểm danh', icon:'check', roles:'manager academic teacher'}]},
+  {group:'Học phí', items:[{id:'debts', label:'Công nợ', icon:'wallet', roles:'admin manager accountant frontdesk'}]},
+  {group:'Phê duyệt', items:[{id:'approvals', label:'Yêu cầu chờ duyệt', icon:'inbox', roles:'admin manager accountant', badge:true}]},
+  {group:'Báo cáo', items:[{id:'reports', label:'Báo cáo hợp nhất', icon:'chart', roles:'admin manager'}]}
+];
+const can = r => r === '*' || r.split(' ').includes(S.role);
+const allowedRoutes = () => NAV.flatMap(g => g.items.filter(i => can(i.roles)).map(i => i.id)).concat(['detail']);
+const waitCount = () => APPROVALS.filter(a => a.status === 'wait' && (S.center === 'all' || a.center === S.center || S.role === 'admin')).length;
+
+/* ================= render ================= */
+const root = document.getElementById('root');
+function render(){
+  applyTheme();
+  /* TẠM TẮT ĐĂNG NHẬP
+  if (!S.logged) { root.innerHTML = viewLogin(); return; }
+  */
+  if (!allowedRoutes().includes(S.route)) S.route = 'dashboard';
+  const oldMain = document.getElementById('main');
+  const keep = oldMain ? oldMain.scrollTop : 0;
+  const mb = document.querySelector('.modal');
+  const keepModal = mb ? mb.scrollTop : 0;
+  root.innerHTML = `
+  <div class="app ${S.navOpen ? 'nav-open' : ''}">
+    ${viewTopbar()}
+    ${S.navOpen ? '<div class="backdrop" data-act="toggleNav" aria-hidden="true"></div>' : ''}
+    <nav class="sidebar" aria-label="Điều hướng chính">${viewSidebar()}</nav>
+    <main class="main" id="main">${viewRoute()}</main>
+  </div>
+  ${S.pop || S.menu ? '<div class="sheet-bg" data-act="closePop" aria-hidden="true"></div>' : ''}
+  ${S.pop ? viewPop() : ''}
+  ${S.menu ? viewRowMenu() : ''}
+  ${S.modal ? viewModal() : ''}
+  ${S.toast ? `<div class="toast" role="status">${ic('ok')}<span>${esc(S.toast.msg)}</span>${S.toast.label ? `<button data-act="toastAction">${esc(S.toast.label)}</button>` : ''}</div>` : ''}`;
+  const nm = document.getElementById('main'); if (nm) nm.scrollTop = keep;
+  const nmb = document.querySelector('.modal'); if (nmb) nmb.scrollTop = keepModal;
+  if (S.pop) positionPop();
+  window.__lr = Date.now();
+}
+function viewRoute(){
+  switch (S.route){
+    case 'dashboard': return viewDashboard();
+    case 'students': return viewStudents();
+    case 'detail': return viewDetail();
+    case 'classes': return viewClasses();
+    case 'schedule': return viewSchedule();
+    case 'attendance': return viewAttendance();
+    case 'approvals': return viewApprovals();
+    case 'debts': return viewDebts();
+    default: return viewPlaceholder();
+  }
+}
+
+/* ---------- login (TẠM TẮT — bỏ comment để dùng lại) ----------
+function viewLogin(){
+  const cells = 'f f f f f e f f x f f f f f f e f f f f f f f f f f'.split(' ').concat(Array(10).fill('')).slice(0,36);
+  return `<div class="login">
+    <section class="login-art" aria-hidden="true">
+      <div class="logo"><div class="logo-mark" style="background:#fff;color:#1D3B8B">A</div><div style="color:#fff">Anh ngữ Hòa Bình<small style="color:rgba(255,255,255,.7)">4 cơ sở · Hà Nội</small></div></div>
+      <div>
+        <h2>Mỗi buổi học đều có dấu vết. Mỗi đồng học phí đều có lý do.</h2>
+        <p>Điểm danh, học bù, bảo lưu và học phí cùng chạy trên một sổ phát sinh, nên số buổi còn lại luôn khớp với số tiền.</p>
+      </div>
+      <div class="art-strip">${cells.map(c => `<i class="${c}"></i>`).join('')}</div>
+    </section>
+    <section class="login-form">
+      <form class="login-box" data-form="login">
+        <div><h1>Đăng nhập</h1><p class="note" style="margin:4px 0 0">Dùng tài khoản do quản trị cơ sở cấp.</p></div>
+        <div class="field"><label for="u">Tên đăng nhập</label><input id="u" class="input" autocomplete="username" value="duc.tm"></div>
+        <div class="field"><label for="p">Mật khẩu</label>
+          <div class="pw"><input id="p" class="input" type="password" autocomplete="current-password" value="demo1234"><button type="button" class="btn btn-ghost btn-sm" data-act="togglePw">Hiện</button></div></div>
+        <div style="display:flex;justify-content:space-between;align-items:center"><label style="display:flex;gap:8px;align-items:center"><input type="checkbox" class="cbx" checked> Ghi nhớ trên máy này</label><a href="#" data-act="noop">Quên mật khẩu?</a></div>
+        <button class="btn btn-primary" style="height:40px;justify-content:center">Đăng nhập</button>
+        <div class="demo-note">Bản xem thử: chọn một vai trò để vào thẳng.
+          <div class="demo-roles" style="margin-top:8px">${Object.entries(ROLES).map(([k,r]) => `<button type="button" data-act="loginAs" data-role="${k}">${r.name}</button>`).join('')}</div>
+        </div>
+      </form>
+    </section>
+  </div>`;
+}
+
+---------- hết phần login ---------- */
+
+/* ---------- topbar & sidebar ---------- */
+function viewTopbar(){
+  const r = ROLES[S.role];
+  const themeIcon = S.theme === 'light' ? 'sun' : S.theme === 'dark' ? 'moon' : 'monitor';
+  const lockCenter = S.role !== 'admin';
+  return `<header class="topbar">
+    <button class="btn icon-btn menu-toggle" data-act="toggleNav" aria-label="Mở menu">${ic('menu')}</button>
+    <div class="logo"><div class="logo-mark">A</div><div>Anh ngữ Hòa Bình<small>Quản lý trung tâm</small></div></div>
+    <button class="top-sel center-sel" data-pop="center" aria-expanded="${S.pop==='center'}" ${lockCenter ? 'title="Vai trò này chỉ làm việc tại một cơ sở"' : ''}>${ic('building')}<span class="hide-sm">${esc(centerName(S.center))}</span>${ic('down','caret')}</button>
+    <button class="top-sel" data-pop="theme" aria-expanded="${S.pop==='theme'}" aria-label="Giao diện">${ic(themeIcon)}</button>
+    <button class="top-sel hide-sm" data-pop="role" aria-expanded="${S.pop==='role'}">${ic('swap')}${esc(r.name)}${ic('down','caret')}</button>
+    <button class="top-sel" data-pop="bell" aria-expanded="${S.pop==='bell'}" aria-label="Thông báo">${ic('bell')}<span class="badge hot">3</span></button>
+    <button class="top-sel" data-pop="user" aria-expanded="${S.pop==='user'}"><span class="avatar" style="width:26px;height:26px;font-size:11px">${initials(r.user)}</span><span class="hide-sm">${esc(r.user)}</span>${ic('down','caret')}</button>
+    
+  </header>`;
+}
+const initials = n => n.split(' ').slice(-2).map(w => w[0]).join('');
+function viewSidebar(){
+  return `<div class="search nav-search">${ic('search')}<input class="input" placeholder="Tìm chức năng" aria-label="Tìm chức năng" data-input="navq"></div>` +
+  NAV.map((g, gi) => {
+    const items = g.items.filter(i => can(i.roles));
+    if (!items.length) return '';
+    return `<div class="nav-group ${S.closedGroups[gi] ? 'closed' : ''}">
+      <button class="nav-group-title" data-act="toggleGroup" data-g="${gi}" aria-expanded="${!S.closedGroups[gi]}">${g.group}${ic('down')}</button>
+      <div class="nav-items">${items.map(i => `<button class="nav-item ${S.route === i.id || (i.id==='students' && S.route==='detail') ? 'active' : ''}" data-go="${i.id}">${ic(i.icon)}<span>${i.label}</span>${i.badge && waitCount() ? `<span class="badge">${waitCount()}</span>` : ''}</button>`).join('')}</div>
+    </div>`;
+  }).join('');
+}
+function viewPop(){
+  const chk = on => `<span class="chk">${on ? ic('ok') : ''}</span>`;
+  if (S.pop === 'center'){
+    const opts = [{id:'all', name:'Tất cả cơ sở'}, ...CENTERS];
+    return `<div class="pop" data-anchor="center" role="menu"><h4>Cơ sở đang làm việc</h4>${opts.map(o => {
+      const dis = S.role !== 'admin' && o.id !== S.center;
+      return `<button class="pop-item" data-act="setCenter" data-c="${o.id}" ${dis ? 'disabled style="opacity:.45;cursor:not-allowed"' : ''}>${chk(S.center === o.id)}<div><b>${o.name}</b>${dis ? '<span class="d">Không thuộc phạm vi vai trò</span>' : ''}</div></button>`;
+    }).join('')}</div>`;
+  }
+  if (S.pop === 'theme'){
+    return `<div class="pop" data-anchor="theme" role="menu"><h4>Giao diện</h4>${[['light','sun','Sáng'],['dark','moon','Tối'],['system','monitor','Theo hệ thống']].map(([k,i,l]) => `<button class="pop-item" data-act="setTheme" data-t="${k}">${chk(S.theme===k)}${ic(i)}<b style="font-weight:500">${l}</b></button>`).join('')}</div>`;
+  }
+  if (S.pop === 'role'){
+    return `<div class="pop" data-anchor="role" style="width:320px" role="menu"><h4>Xem với vai trò (bản xem thử)</h4>${Object.entries(ROLES).map(([k,r]) => `<button class="pop-item" data-act="setRole" data-role="${k}">${chk(S.role===k)}<div><b>${r.name}</b><span class="d">${r.desc}</span></div></button>`).join('')}</div>`;
+  }
+  if (S.pop === 'bell'){
+    return `<div class="pop" data-anchor="bell" style="width:340px"><h4>Thông báo</h4>
+      <button class="pop-item" data-go="approvals"><span class="todo-ico" style="background:var(--accent-soft);color:var(--accent)">${ic('inbox')}</span><div><b>Yêu cầu hoàn phí mới</b><span class="d">Hồ Nhật Minh · 3.024.000 đ</span></div></button>
+      <button class="pop-item" data-go="attendance"><span class="todo-ico" style="background:var(--warn-soft);color:var(--warn)">${ic('clock')}</span><div><b>Lớp PET-2 chưa điểm danh</b><span class="d">Buổi 18:00 hôm nay sẽ khóa sau 48 giờ</span></div></button>
+      <button class="pop-item" data-act="openStudent" data-id="HV01049"><span class="todo-ico" style="background:var(--danger-soft);color:var(--danger)">${ic('alert')}</span><div><b>Ngô Tuấn Kiệt quá hạn học phí</b><span class="d">Còn nợ 3.200.000 đ, quá hạn 6 ngày</span></div></button>
+    </div>`;
+  }
+  if (S.pop === 'user'){
+    const r = ROLES[S.role];
+    return `<div class="pop" data-anchor="user"><div style="padding:8px 10px"><b>${r.user}</b><div class="note">${r.handle} · ${r.name}</div></div><div class="pop-sep"></div>
+      <!-- TẠM TẮT ĐĂNG NHẬP: ẩn nút Đăng xuất
+      <button class="pop-item" data-act="logout" style="color:var(--danger)">Đăng xuất</button> -->
+      <div class="only-sm"><h4>Xem với vai trò (bản xem thử)</h4>${Object.entries(ROLES).map(([k,x]) => `<button class="pop-item" data-act="setRole" data-role="${k}">${chk(S.role===k)}<div><b>${x.name}</b><span class="d">${x.desc}</span></div></button>`).join('')}<div class="pop-sep"></div></div>
+      <div class="note" style="padding:6px 10px">Đăng nhập đang tạm tắt trong bản xem thử. Đổi vai trò ở thanh trên cùng hoặc trong menu này.</div></div>`;
+  }
+  if (S.pop === 'fStatus' || S.pop === 'fCourse'){
+    const isS = S.pop === 'fStatus';
+    const opts = isS ? Object.entries(STATUS).map(([k,v]) => [k, v.label, v.cls]) : COURSES.map(c => [c,c,'']);
+    const cur = isS ? S.fStatus : S.fCourse;
+    return `<div class="pop" data-anchor="${S.pop}" role="listbox" aria-multiselectable="true"><h4>${isS ? 'Trạng thái ghi danh' : 'Khóa học'}</h4>
+      ${!isS ? `<div class="search">${ic('search')}<input class="input" placeholder="Tìm khóa" data-input="popq" aria-label="Tìm khóa"></div>` : ''}
+      <div data-poplist>${opts.map(([k,l,c]) => `<button class="pop-item" data-act="toggleF" data-f="${S.pop}" data-v="${esc(k)}" data-label="${esc(l)}" role="option" aria-selected="${cur.includes(k)}"><input type="checkbox" class="cbx" tabindex="-1" ${cur.includes(k) ? 'checked' : ''}>${isS ? `<span class="chip ${c}" style="pointer-events:none">${l}</span>` : `<span>${l}</span>`}</button>`).join('')}</div></div>`;
+  }
+  return '';
+}
+function positionPop(){
+  const pop = document.querySelector('.pop');
+  if (!pop) return;
+  const btn = document.querySelector(`[data-pop="${pop.dataset.anchor}"]`);
+  if (!btn) return;
+  const b = btn.getBoundingClientRect();
+  if (window.innerWidth <= 640) return;
+  const host = {left:0, top:0};
+  let left = b.left - host.left;
+  const w = pop.offsetWidth;
+  if (b.left + w > window.innerWidth - 12) left = b.right - host.left - w;
+  pop.style.left = Math.max(8 - host.left, left) + 'px';
+  pop.style.top = (b.bottom - host.top + 6) + 'px';
+}
+
+/* ---------- dashboard ---------- */
+function scopeStudents(){ return STUDENTS.filter(s => S.center === 'all' || s.center === S.center); }
+function scopeClasses(){ return CLASSES.filter(c => S.center === 'all' || c.center === S.center); }
+function viewDashboard(){
+  const list = scopeStudents();
+  const active = list.filter(s => s.status === 'active').length;
+  const low = list.filter(s => s.status === 'active' && remaining(s) <= 3).length;
+  const debtList = list.filter(s => s.debt > 0 && s.status !== 'pending');
+  const debtSum = debtList.reduce((a,s) => a + s.debt, 0);
+  const under = scopeClasses().filter(c => classMeta(c).status === 'running' && enrolledIn(c) < c.min).length;
+  const teacher = S.role === 'teacher';
+  const kpis = teacher ? [
+    {lbl:'Lớp đang dạy', val:'4', sub:'FLY-1, PET-2 (Cầu Giấy); KET-1, PET-1 (Hà Đông)', go:'schedule', goText:'Xem lịch'},
+    {lbl:'Buổi hôm nay', val:'1', sub:'PET-1 lúc 09:45 tại Hà Đông', go:'schedule', goText:'Xem lịch'},
+    {lbl:'Chưa điểm danh', val:'1', sub:'Khóa sau 48 giờ', go:'attendance', goText:'Điểm danh ngay', cls:'warnk'},
+    {lbl:'Học viên vắng 2 buổi liền', val:'3', sub:'Cần báo học vụ', go:'students', goText:'Xem danh sách', cls:'alert'},
+    {lbl:'Nhận xét giữa khóa', val:'12', sub:'Hạn nộp 20/10/2026', go:'attendance', goText:'Mở lớp'}
+  ] : [
+    {lbl:'Học viên đang học', val:fmt(active), sub:'Trên ' + scopeClasses().filter(c => classMeta(c).status === 'running').length + ' lớp đang chạy', go:'students', f:{fStatus:['active']}, goText:'Mở danh sách'},
+    {lbl:'Sắp hết buổi', val:fmt(low), sub:'Còn từ 3 buổi trở xuống', go:'students', f:{fLow:true}, goText:'Tư vấn tái ghi danh', cls:'warnk'},
+    {lbl:'Công nợ', val:(debtSum/1e6).toFixed(1).replace('.',',') + ' tr', sub:debtList.length + ' học viên còn nợ', go:'debts', goText:'Xem công nợ', cls:'alert'},
+    {lbl:'Chờ duyệt', val:String(waitCount()), sub:'Hoàn phí, ưu đãi, mở khóa', go:'approvals', goText:'Duyệt ngay'},
+    {lbl:'Lớp thiếu sĩ số', val:String(under), sub:'Dưới mức mở lớp (6 học viên)', go:'classes', goText:'Xem lớp'}
+  ];
+  const todayDay = dayNum(toD(TODAY));
+  const today = scopeClasses().filter(c => c.days.includes(todayDay) && classMeta(c).status === 'running')
+    .sort((a,b) => a.time.localeCompare(b.time))
+    .map(c => {
+      const st = c.time < '09:45' && c.time < NOW_TIME ? ['Đã điểm danh','s-done'] : (c.time <= NOW_TIME ? ['Đang diễn ra','s-active'] : ['Sắp tới','s-pending']);
+      return [c.time, `${c.code} · ${c.course}`, `${c.room} · ${c.teacher} · ${enrolledIn(c)}/${c.max} học viên${S.center==='all' ? ' · ' + centerShort(c.center) : ''}`, st[0], st[1], c];
+    });
+  const todo = teacher ? [
+    ['attendance','check','var(--warn-soft)','var(--warn)','Điểm danh PET-2 buổi 26','Lớp thứ Ba 13/10, tự khóa 48 giờ sau buổi học'],
+    ['students','alert','var(--danger-soft)','var(--danger)','3 học viên vắng 2 buổi liên tiếp','Học vụ sẽ gọi phụ huynh sau khi bạn ghi chú']
+  ] : [
+    ['approvals','inbox','var(--accent-soft)','var(--accent)', waitCount() + ' yêu cầu chờ bạn duyệt','Cũ nhất gửi lúc 14:22 ngày 08/10'],
+    ['classes','layers','var(--warn-soft)','var(--warn)', under + ' lớp dưới sĩ số mở lớp','Cân nhắc gộp lớp hoặc tuyển thêm trước cuối tháng'],
+    ['debts','wallet','var(--danger-soft)','var(--danger)', debtList.length + ' học viên còn nợ học phí','Tổng ' + vnd(debtSum)],
+    ['students','users','var(--ok-soft)','var(--ok)', low + ' học viên còn ≤ 3 buổi','Gửi lời mời tái ghi danh trước khi khóa kết thúc']
+  ];
+  return `
+  <div class="crumbs">Tổng quan</div>
+  <div class="page-head"><div><h1>Chào ${esc(ROLES[S.role].user.split(' ').pop())}</h1><p>${esc(centerName(S.center))}, thứ Bảy 10/10/2026. Bấm vào một số liệu để mở danh sách tương ứng.</p></div>
+    <div class="tools">${can(P.addStudent) ? `<button class="btn btn-primary" data-act="openStudentForm">${ic('plus')}Ghi danh mới</button>` : ''}</div></div>
+  <div class="kpis">${kpis.map((x,i) => `<button class="kpi ${x.cls||''}" data-act="kpi" data-go2="${x.go}" data-f='${JSON.stringify(x.f||{})}'><span class="lbl">${x.lbl}</span><span class="val num">${x.val}</span><span class="sub">${x.sub}</span><span class="go">${x.goText}</span></button>`).join('')}</div>
+  <div class="grid-2">
+    <section class="card"><div class="card-head"><h2>Lớp học hôm nay</h2><button class="linkbtn" data-go="schedule">Cả tuần</button></div>
+      ${today.length ? today.map(t => `<button class="list-row todo-row" data-act="openClass" data-center="${t[5].center}" data-c="${t[5].code}"><div class="time num">${t[0]}</div><div class="grow"><b>${t[1]}</b><div class="meta">${t[2]}</div></div><span class="chip ${t[4]}">${t[3]}</span></button>`).join('') : '<div class="empty"><p>Hôm nay không có lớp.</p></div>'}
+    </section>
+    <section class="card"><div class="card-head"><h2>Việc cần làm</h2></div>
+      ${todo.map(t => `<button class="list-row todo-row" data-go="${t[0]}"><span class="todo-ico" style="background:${t[2]};color:${t[3]}">${ic(t[1])}</span><div class="grow"><b>${t[4]}</b><div class="meta">${t[5]}</div></div>${ic('move','faint-ico')}</button>`).join('')}
+    </section>
+  </div>`;
+}
+
+/* ---------- students ---------- */
+function filtered(){
+  const q = S.q.trim().toLowerCase();
+  return scopeStudents().filter(s =>
+    (!q || s.name.toLowerCase().includes(q) || s.id.toLowerCase().includes(q) || s.cls.toLowerCase() === q || s.cls.toLowerCase().includes(q) || s.phone.includes(q.replace(/\s/g,''))) &&
+    (!S.fStatus.length || S.fStatus.includes(s.status)) &&
+    (!S.fCourse.length || S.fCourse.includes(s.course)) &&
+    (!S.fLow || (s.status === 'active' && remaining(s) <= 3)) &&
+    (S.role !== 'teacher' || (['PET-2','FLY-1'].includes(s.cls) && s.center === 'cg') || (['PET-1','KET-1'].includes(s.cls) && s.center === 'hd'))
+  );
+}
+function pageList(cur, total){
+  if (total <= 7) return Array.from({length:total}, (_,i) => i + 1);
+  const set = new Set([1, total, cur, cur - 1, cur + 1]);
+  const arr = [...set].filter(n => n >= 1 && n <= total).sort((a,b) => a - b);
+  const out = []; arr.forEach((n,i) => { if (i && n - arr[i-1] > 1) out.push('…'); out.push(n); });
+  return out;
+}
+function pager(total, page, size, act){
+  const pages = Math.max(1, Math.ceil(total / size));
+  return `<div class="pager">
+    <div class="num">Hiển thị ${total ? (page-1)*size+1 : 0}–${Math.min(page*size, total)} trên ${fmt(total)}</div>
+    <div class="pg">
+      <span class="hide-sm" style="margin-right:6px">Số dòng</span>${[10,20,50].map(n => `<button class="${size===n?'on':''}" data-act="${act}Size" data-n="${n}">${n}</button>`).join('')}
+      <span style="width:16px"></span>
+      <button data-act="${act}Page" data-n="${page-1}" ${page<=1?'disabled':''}>Trước</button>
+      ${pageList(page, pages).map(n => n === '…' ? '<span class="gap">…</span>' : `<button class="${page===n?'on':''}" data-act="${act}Page" data-n="${n}">${n}</button>`).join('')}
+      <button data-act="${act}Page" data-n="${page+1}" ${page>=pages?'disabled':''}>Sau</button>
+    </div></div>`;
+}
+function viewStudents(){
+  const rows = filtered();
+  const pages = Math.max(1, Math.ceil(rows.length / S.size));
+  if (S.page > pages) S.page = pages;
+  const pageRows = rows.slice((S.page-1)*S.size, S.page*S.size);
+  const nF = S.fStatus.length + S.fCourse.length + (S.fLow ? 1 : 0) + (S.q ? 1 : 0);
+  const teacher = S.role === 'teacher';
+  const showMoney = can(P.money);
+  const allChecked = pageRows.length && pageRows.every(r => S.selected.has(r.id));
+  const fLabel = (arr, base, map) => arr.length ? `${base}: ${arr.length === 1 ? (map ? map(arr[0]) : arr[0]) : arr.length + ' mục'}` : base;
+  return `
+  <div class="crumbs"><a href="#" data-go="dashboard">Tổng quan</a> / Học viên</div>
+  <div class="page-head">
+    <div><h1>${teacher ? 'Học viên lớp tôi' : 'Danh sách học viên'}</h1><p class="num">${fmt(rows.length)} học viên${S.center==='all' ? ' trên 4 cơ sở' : ' tại ' + esc(centerName(S.center))}</p></div>
+    <div class="tools">
+      <div class="search">${ic('search')}<input class="input" placeholder="Tìm tên, mã HV, mã lớp, SĐT" value="${esc(S.q)}" data-input="q" aria-label="Tìm học viên"></div>
+      ${!teacher ? `<button class="btn" data-act="mock" data-msg="Đã xuất ${rows.length} học viên ra Excel">${ic('dl')}Xuất Excel</button>` : ''}
+      ${can(P.addStudent) ? `<button class="btn btn-primary" data-act="openStudentForm">${ic('plus')}Ghi danh mới</button>` : ''}
+    </div>
+  </div>
+  <div class="filters">
+    <button class="fbtn ${S.fStatus.length?'on':''}" data-pop="fStatus" aria-expanded="${S.pop==='fStatus'}">${fLabel(S.fStatus,'Trạng thái', k => STATUS[k].label)}${ic('down')}</button>
+    <button class="fbtn ${S.fCourse.length?'on':''}" data-pop="fCourse" aria-expanded="${S.pop==='fCourse'}">${fLabel(S.fCourse,'Khóa học')}${ic('down')}</button>
+    <button class="fbtn ${S.fLow?'on':''}" data-act="toggleLow" aria-pressed="${S.fLow}">${S.fLow ? ic('ok') : ''}Sắp hết buổi (≤ 3)</button>
+    ${nF ? `<button class="linkbtn" data-act="clearF">Xóa lọc (${nF})</button>` : ''}
+  </div>
+  ${rows.length ? `
+  <div class="table-wrap"><table class="cards">
+    <thead><tr>
+      <th style="width:36px"><input type="checkbox" class="cbx" data-act="checkAll" ${allChecked ? 'checked' : ''} aria-label="Chọn tất cả trên trang"></th>
+      <th>Học viên</th><th>Khóa / lớp</th>${S.center==='all' ? '<th>Cơ sở</th>' : ''}<th>Buổi còn lại</th><th>Trạng thái</th>${showMoney ? '<th class="r">Công nợ</th>' : ''}<th style="width:44px"><span class="sr">Thao tác</span></th>
+    </tr></thead>
+    <tbody>${pageRows.map(s => {
+      const rem = remaining(s), pct = Math.round(s.used / s.total * 100), low = s.status==='active' && rem <= 3;
+      return `<tr data-act="openStudent" data-id="${s.id}" class="${S.selected.has(s.id)?'sel':''} ${S.flash === s.id ? 'flash' : ''}">
+        <td data-stop class="c-cbx"><input type="checkbox" class="cbx" data-act="check" data-id="${s.id}" ${S.selected.has(s.id)?'checked':''} aria-label="Chọn ${esc(s.name)}"></td>
+        <td class="cell-name"><b>${esc(s.name)}</b><span class="num">${s.id}${teacher ? '' : ' · PH ' + maskPhone(s.phone)}</span></td>
+        <td data-label="Khóa / lớp">${s.course}<div class="tag-inline">${s.cls || 'Chưa có lớp'}</div></td>
+        ${S.center==='all' ? `<td data-label="Cơ sở">${centerShort(s.center)}</td>` : ''}
+        <td data-label="Buổi còn lại"><div class="mini"><div class="mini-bar ${low?'low':''}" role="img" aria-label="Đã dùng ${s.used}/${s.total} buổi"><i style="width:${pct}%"></i></div><span class="rem num ${low?'low':''}">${rem}<span class="tag-inline">/${s.total}</span></span>${s.credit ? `<span class="tag-inline">${s.credit} bù</span>` : ''}</div></td>
+        <td data-label="Trạng thái"><span class="chip ${STATUS[s.status].cls}">${STATUS[s.status].label}</span></td>
+        ${showMoney ? `<td data-label="Công nợ" class="r num" style="${s.debt?'color:var(--danger);font-weight:600':''}">${s.debt ? vnd(s.debt) : '—'}</td>` : ''}
+        <td data-stop class="r c-more"><button class="row-act" data-act="rowMenu" data-kind="student" data-id="${s.id}" aria-label="Thao tác với ${esc(s.name)}">${ic('more')}</button></td>
+      </tr>`; }).join('')}
+    </tbody></table></div>
+  ${pager(rows.length, S.page, S.size, 's')}
+  ${S.selected.size ? `<div class="bulk" role="region" aria-label="Thao tác hàng loạt"><b class="num">Đã chọn ${S.selected.size}</b>
+    <button class="btn" data-act="bulk" data-msg="Đã gửi lời mời tái ghi danh cho ${S.selected.size} phụ huynh">${ic('send')}Gửi lời mời tái ghi danh</button>
+    <button class="btn" data-act="bulk" data-msg="Đã xuất ${S.selected.size} học viên ra Excel">${ic('dl')}Xuất Excel</button>
+    <button class="btn" data-act="clearSel">Bỏ chọn</button></div>` : ''}
+  ` : `<div class="card empty">${ic('search')}<h3>Không có học viên khớp bộ lọc</h3><p>Đang lọc theo ${nF} điều kiện tại ${esc(centerName(S.center))}.</p><button class="btn" data-act="clearF">Xóa lọc</button></div>`}`;
+}
+
+/* ---------- enrollment detail ---------- */
+function sessionsFor(s){
+  const cells = [];
+  const isMain = s.id === 'HV01040';
+  const absentIdx = isMain ? [6,15] : (s.used > 8 ? [Math.floor(s.used/2)] : []);
+  const excusedIdx = isMain ? [11] : (s.credit ? [Math.max(0,s.used-3)] : []);
+  const cancelIdx = isMain ? [19] : [];
+  let held = 0;
+  for (let i = 0; i < s.total + cancelIdx.length; i++){
+    if (cancelIdx.includes(i)) { cells.push({k:'cancel', t:'Buổi bị hủy (GV ốm), đã nối cuối khóa'}); continue; }
+    if (held < s.used){
+      const n = held + 1;
+      if (absentIdx.includes(i)) cells.push({k:'absent', t:`Buổi ${n}: vắng không phép`});
+      else if (excusedIdx.includes(i)) cells.push({k:'excused', t:`Buổi ${n}: vắng có phép, cấp 1 quyền bù`});
+      else cells.push({k:'attend', t:`Buổi ${n}: có mặt`});
+      held++;
+    } else {
+      const isNext = held === s.used && (s.status === 'active');
+      cells.push({k: isNext ? 'next' : '', t: isNext ? `Buổi ${held+1}: buổi kế tiếp` : `Buổi ${held+1}: chưa diễn ra`});
+      held++;
+    }
+  }
+  for (let c = 0; c < s.credit; c++) cells.push({k:'credit', t:'Quyền học bù, hết hạn 05/11/2026'});
+  return cells;
+}
+function viewDetail(){
+  const s = STUDENTS.find(x => x.id === S.detailId);
+  if (!s) return viewPlaceholder();
+  const cells = sessionsFor(s);
+  const rem = remaining(s);
+  const m = money(s);
+  const absent = cells.filter(c => c.k==='absent').length, excused = cells.filter(c => c.k==='excused').length;
+  const isMain = s.id === 'HV01040';
+  const disc = DISCOUNTS.find(d => d.id === s.discount) || DISCOUNTS[0];
+  const ledger = isMain ? [
+    ['10/10/2026','Có mặt','Buổi 25 · Unit 9 · GV Lê Quang Vinh','−1','minus'],
+    ['08/10/2026','Có mặt','Buổi 24 · Unit 8 · điểm danh bởi Lê Quang Vinh','−1','minus'],
+    ['06/10/2026','Buổi bị hủy','GV ốm · nối 1 buổi vào cuối khóa · học vụ Phạm Thu Hà','0','zero'],
+    ['17/09/2026','Vắng có phép','Buổi 12 · PH báo trước 26 giờ qua cổng phụ huynh · cấp 1 quyền bù','−1  +1 bù','minus'],
+    ['01/09/2026','Thu tiền đợt 1','PT-2026-0812 · chuyển khoản · Vũ Ngọc Ánh','7.000.000 đ','plus'],
+    ['01/09/2026','Ghi danh PET (36 buổi)','Không áp dụng ưu đãi · chính sách hoàn phí v3','+36','plus']
+  ] : [
+    ...(s.history || []),
+    ...(s.used ? [['09/10/2026','Có mặt','Buổi ' + s.used + ' · điểm danh bởi giáo viên lớp','−1','minus']] : []),
+    ...(m.paid ? [[vnDate(s.created), 'Thu tiền', 'Phiếu thu tại quầy', vnd(m.paid), 'plus']] : []),
+    [vnDate(s.created), 'Ghi danh ' + s.course + ' (' + s.total + ' buổi)', (disc.pct ? 'Ưu đãi ' + disc.label + ' · ' : '') + 'chính sách hoàn phí v3','+' + s.total,'plus']
+  ];
+  const canMoney = can(P.money);
+  return `
+  <div class="crumbs"><a href="#" data-go="students">Học viên</a> / ${esc(s.name)}</div>
+  <div class="page-head">
+    <div class="person"><div class="avatar">${initials(s.name)}</div><div><h1>${esc(s.name)}</h1><p class="num">${s.id} · ${s.course}, ${s.cls ? 'lớp ' + s.cls : 'chưa xếp lớp'} · ${esc(centerName(s.center))}</p></div></div>
+    <div class="tools"><span class="chip ${STATUS[s.status].cls}">${STATUS[s.status].label}</span>
+      ${can(P.editStudent) ? `<button class="btn" data-act="editStudent" data-id="${s.id}">${ic('edit')}Sửa thông tin</button>` : ''}
+      ${can(P.deleteStudent) ? `<button class="btn btn-danger" data-act="deleteStudent" data-id="${s.id}">${ic('trash')}Xóa</button>` : ''}</div>
+  </div>
+  <div class="detail-grid">
+    <div style="display:flex;flex-direction:column;gap:16px;min-width:0">
+      <section class="card strip-card" aria-label="Sổ buổi học">
+        <div class="strip-top">
+          <div class="big-rem"><strong class="num">${rem}</strong><span>buổi còn lại: ${s.total - s.used} buổi chưa diễn ra${s.credit ? ` và ${s.credit} quyền học bù` : ''}</span></div>
+          <div class="strip-stats num">
+            <div><b>${s.used}</b>buổi đã trừ</div>
+            <div><b>${absent + excused}</b>vắng (${excused} có phép)</div>
+            <div><b>${s.credit}</b>quyền bù chưa dùng</div>
+          </div>
+        </div>
+        <div class="strip">${cells.map(c => `<div class="cell ${c.k}" tabindex="0" aria-label="${esc(c.t)}"><span class="tip">${esc(c.t)}</span></div>`).join('')}</div>
+        <div class="legend">
+          <span><i style="background:var(--cell-attend);border-color:var(--cell-attend)"></i>Có mặt</span>
+          <span><i style="background:var(--cell-excused);border-color:var(--cell-excused)"></i>Vắng có phép</span>
+          <span><i style="background:repeating-linear-gradient(135deg,var(--cell-absent) 0 2px,transparent 2px 4px);border-color:var(--cell-absent)"></i>Vắng không phép</span>
+          <span><i style="background:var(--cell-cancel);border-color:var(--cell-cancel)"></i>Trung tâm hủy, không trừ</span>
+          <span><i style="border-color:var(--brand)"></i>Buổi kế tiếp</span>
+          <span><i style="border-style:dashed;border-color:var(--cell-makeup)"></i>Quyền học bù</span>
+        </div>
+      </section>
+      <section class="card">
+        <div class="card-head"><h2>Sổ phát sinh</h2><span class="note">Không sửa trực tiếp; sai sót được ghi bằng phát sinh đảo</span></div>
+        <ul class="ledger">${ledger.map(l => `<li><span class="when num">${l[0]}</span><div class="what"><b>${l[1]}</b><div>${esc(l[2])}</div></div><span class="delta num ${l[4]}">${l[3]}</span></li>`).join('')}</ul>
+      </section>
+    </div>
+    <aside style="display:flex;flex-direction:column;gap:16px">
+      ${canMoney ? `<section class="card"><div class="card-head"><h2>Học phí</h2><span class="note num">${vnd(m.unit)} / buổi</span></div>
+        <div class="money num">
+          <div class="money-row"><span>Học phí gốc</span><b>${vnd(m.gross)}</b></div>
+          ${m.pct ? `<div class="money-row"><span>Ưu đãi ${disc.label.toLowerCase()}</span><b>− ${vnd(m.gross - m.fee)}</b></div>` : ''}
+          <div class="money-row"><span>Đã thu</span><b>${vnd(m.paid)}</b></div>
+          <div class="money-row ${s.debt ? 'hl' : 'ok'}"><span>Còn phải thu</span><b>${s.debt ? vnd(s.debt) : 'Đã đóng đủ'}</b></div>
+          <div class="money-row"><span>Doanh thu đã thực hiện</span><b>${vnd(m.earned)}</b></div>
+          <div class="money-row"><span>Tiền nhận trước</span><b>${vnd(Math.max(0, m.paid - m.earned))}</b></div>
+        </div>
+        ${s.debt ? `<div style="padding:0 16px 14px"><button class="btn btn-sm" data-act="collect" data-id="${s.id}">Ghi nhận thu tiền</button></div>` : ''}</section>` : ''}
+      <section class="card"><div class="card-head"><h2>Thao tác</h2></div>
+        <div class="actions-col">
+          <button class="btn" data-act="mock" data-msg="Đã mở luồng chuyển lớp (bản xem thử)">${ic('move')}Chuyển lớp</button>
+          <button class="btn" data-act="mock" data-msg="Đã mở luồng bảo lưu (bản xem thử)">${ic('pause')}Bảo lưu</button>
+          <button class="btn" data-act="mock" data-msg="Đã mở danh sách lớp có thể học bù">${ic('cal')}Xếp học bù</button>
+          ${canMoney ? `<button class="btn btn-danger" data-act="refund" data-id="${s.id}">${ic('refund')}Yêu cầu hoàn phí</button>` : ''}
+          <p class="note" style="margin:4px 0 0">Mọi thao tác thay đổi buổi hoặc tiền đều ghi vào sổ phát sinh; hoàn phí cần quản lý cơ sở duyệt.</p>
+        </div>
+      </section>
+      <section class="card"><div class="card-head"><h2>Hồ sơ</h2>${can(P.editStudent) ? `<button class="linkbtn" data-act="editStudent" data-id="${s.id}">Sửa</button>` : ''}</div>
+        <div class="money">
+          <div class="money-row"><span>Ngày sinh</span><b class="num">${vnDate(s.dob)}</b></div>
+          <div class="money-row"><span>Phụ huynh</span><b>${esc(s.parent)}</b></div>
+          <div class="money-row"><span>Điện thoại</span><b class="num">${S.role==='teacher' ? 'Ẩn với giáo viên' : maskPhone(s.phone)}</b></div>
+          ${s.note ? `<div class="money-row"><span>Ghi chú</span><b>${esc(s.note)}</b></div>` : ''}
+        </div>
+      </section>
+    </aside>
+  </div>`;
+}
+
+/* ---------- classes ---------- */
+function classRows(){
+  const q = S.cq.trim().toLowerCase();
+  return scopeClasses().map(c => ({c, m:classMeta(c), n:enrolledIn(c)}))
+    .filter(r => (!q || r.c.code.toLowerCase().includes(q) || r.c.course.toLowerCase().includes(q) || r.c.teacher.toLowerCase().includes(q)) &&
+      (S.cStatus === 'all' || (S.cStatus === 'under' ? (r.m.status === 'running' && r.n < r.c.min) : r.m.status === S.cStatus)))
+    .sort((a,b) => (a.c.center + a.c.code).localeCompare(b.c.center + b.c.code));
+}
+const daysText = c => c.days.slice().sort((a,b) => a - b).map(d => DAY_LABEL[d]).join(', ') + ' · ' + c.time;
+function viewClasses(){
+  const all = scopeClasses().map(c => ({c, m:classMeta(c), n:enrolledIn(c)}));
+  const cnt = k => k === 'all' ? all.length : k === 'under' ? all.filter(r => r.m.status === 'running' && r.n < r.c.min).length : all.filter(r => r.m.status === k).length;
+  const rows = classRows();
+  const pages = Math.max(1, Math.ceil(rows.length / S.size));
+  if (S.cpage > pages) S.cpage = pages;
+  const pageRows = rows.slice((S.cpage-1)*S.size, S.cpage*S.size);
+  const tabs = [['all','Tất cả'],['running','Đang học'],['upcoming','Sắp khai giảng'],['under','Thiếu sĩ số'],['ended','Đã kết thúc']];
+  return `
+  <div class="crumbs"><a href="#" data-go="dashboard">Tổng quan</a> / Lớp & lịch</div>
+  <div class="page-head">
+    <div><h1>Danh sách lớp</h1><p class="num">${rows.length} lớp${S.center==='all' ? ' trên 4 cơ sở' : ' tại ' + esc(centerName(S.center))}</p></div>
+    <div class="tools">
+      <div class="search">${ic('search')}<input class="input" placeholder="Tìm mã lớp, khóa, giáo viên" value="${esc(S.cq)}" data-input="cq" aria-label="Tìm lớp"></div>
+      ${can(P.editClass) ? `<button class="btn btn-primary" data-act="openClassForm">${ic('plus')}Mở lớp mới</button>` : ''}
+    </div>
+  </div>
+  <div class="filters"><div class="tabs" role="tablist">${tabs.map(([k,l]) => `<button role="tab" aria-selected="${S.cStatus===k}" class="${S.cStatus===k?'on':''}" data-act="cTab" data-k="${k}">${l}<span class="badge num">${cnt(k)}</span></button>`).join('')}</div></div>
+  ${rows.length ? `<div class="table-wrap"><table class="cards nocbx">
+    <thead><tr><th>Lớp</th>${S.center==='all' ? '<th>Cơ sở</th>' : ''}<th>Lịch học</th><th>Phòng</th><th>Giáo viên</th><th>Sĩ số</th><th>Tiến độ</th><th>Trạng thái</th><th style="width:44px"><span class="sr">Thao tác</span></th></tr></thead>
+    <tbody>${pageRows.map(({c,m,n}) => {
+      const under = m.status === 'running' && n < c.min, pct = Math.round(n / c.max * 100);
+      return `<tr data-act="openClassStudents" data-center="${c.center}" data-c="${c.code}" class="${S.flash === c.center + c.code ? 'flash' : ''}">
+        <td class="cell-name"><b>${c.code}</b><span>${c.course}</span></td>
+        ${S.center==='all' ? `<td data-label="Cơ sở">${centerShort(c.center)}</td>` : ''}
+        <td class="num" data-label="Lịch học">${daysText(c)}</td><td data-label="Phòng">${c.room}</td><td data-label="Giáo viên">${esc(c.teacher)}</td>
+        <td data-label="Sĩ số"><div class="mini"><div class="mini-bar ${under?'low':''}"><i style="width:${pct}%"></i></div><span class="rem num ${under?'low':''}">${n}<span class="tag-inline">/${c.max}</span></span></div>${under ? '<div class="tag-inline" style="color:var(--warn)">Dưới mức mở lớp (' + c.min + ')</div>' : ''}</td>
+        <td class="num" data-label="Tiến độ">${m.status === 'upcoming' ? 'Khai giảng ' + vnDate(c.start) : `Buổi ${m.held}/${m.n}`}<div class="tag-inline">${vnDate(c.start)} – ${vnDate(m.end)}</div></td>
+        <td data-label="Trạng thái"><span class="chip ${CLASS_STATUS[m.status].cls}">${CLASS_STATUS[m.status].label}</span></td>
+        <td data-stop class="r c-more"><button class="row-act" data-act="rowMenu" data-kind="class" data-id="${c.center}|${c.code}" aria-label="Thao tác với lớp ${c.code}">${ic('more')}</button></td>
+      </tr>`; }).join('')}</tbody></table></div>
+  ${pager(rows.length, S.cpage, S.size, 'c')}` : `<div class="card empty">${ic('layers')}<h3>Không có lớp nào ở mục này</h3><p>Chọn mục khác hoặc mở lớp mới.</p>${can(P.editClass) ? `<button class="btn btn-primary" data-act="openClassForm">${ic('plus')}Mở lớp mới</button>` : ''}</div>`}`;
+}
+
+/* ---------- schedule (sinh từ danh sách lớp) ---------- */
+function viewSchedule(){
+  const center = S.center === 'all' ? 'cg' : S.center;
+  const weekStart = '2026-10-12';
+  const days = Array.from({length:7}, (_,i) => { const d = toD(weekStart); d.setUTCDate(d.getUTCDate() + i); return isoOf(d); });
+  const cls = CLASSES.filter(c => c.center === center).map(c => ({c, m:classMeta(c), n:enrolledIn(c)}));
+  const slots = [...new Set(cls.map(r => r.c.time))].sort();
+  return `
+  <div class="crumbs"><a href="#" data-go="dashboard">Tổng quan</a> / Lớp & lịch</div>
+  <div class="page-head">
+    <div><h1>Thời khóa biểu tuần 12–18/10/2026</h1><p>${esc(centerName(center))}${S.center==='all' ? ' (chọn cơ sở ở thanh trên để xem nơi khác)' : ''}, ${cls.filter(r => r.m.status !== 'ended').length} lớp, ${ROOMS[center].length} phòng.</p></div>
+    <div class="tools"><button class="btn">Tuần trước</button><button class="btn">Tuần sau</button>${can(P.editClass) ? `<button class="btn" data-act="openClassForm">${ic('plus')}Mở lớp mới</button><button class="btn btn-primary" data-act="mock" data-msg="Đã mở công cụ đóng cửa đột xuất: chọn ngày, hệ thống liệt kê lớp bị ảnh hưởng">${ic('alert')}Đóng cửa đột xuất</button>` : ''}</div>
+  </div>
+  <div class="filters"><span class="chip s-pending">Đủ sĩ số</span><span class="chip s-hold">Dưới mức mở lớp</span><span class="chip">Đã hủy và dời</span><span class="note">Bấm vào một lớp để điểm danh.</span></div>
+  <div class="tt-wrap"><div class="tt">
+    <div class="h"></div>${days.map(d => `<div class="h ${HOLIDAYS[d]?'holiday':''}">${DAY_LABEL[dayNum(toD(d))]}<small>${d.slice(8,10)}/${d.slice(5,7)}</small></div>`).join('')}
+    ${slots.map((sl, si) => `<div class="slot num">${sl}</div>${days.map(d => {
+      if (HOLIDAYS[d]) return `<div class="c hol">${si===0 ? `<span class="hol-label">Nghỉ: ${HOLIDAYS[d].toLowerCase()}. Các buổi đã nối cuối khóa.</span>` : ''}</div>`;
+      const list = cls.filter(r => r.c.time === sl && r.m.dates.includes(d));
+      return `<div class="c">${list.map(({c,n}) => {
+        const cancel = CANCELLED[`${c.center}|${c.code}|${d}`];
+        const x = cancel ? 'cancelled' : (n < c.min ? 'under' : '');
+        return `<button class="cls ${x}" data-act="openClass" data-center="${c.center}" data-c="${c.code}"><b>${c.code} · ${c.course}</b><span>${c.room} · ${esc(c.teacher)}</span><span class="num">${cancel || n + '/' + c.max + ' học viên' + (x==='under' ? ', thiếu sĩ số' : '')}</span></button>`;
+      }).join('')}</div>`;
+    }).join('')}`).join('')}
+  </div></div>`;
+}
+
+/* ---------- attendance ---------- */
+function viewAttendance(){
+  const c = findClass(S.attClass.center, S.attClass.code) || findClass('cg','PET-2');
+  const m = classMeta(c);
+  const roster = STUDENTS.filter(s => s.center === c.center && s.cls === c.code && s.status === 'active').map((s,i) => ({n:s.name, id:s.id, preset: i === 3 ? 'e' : null}));
+  if (c.code === 'PET-2') roster.push({n:'Quách An Nhiên', id:'HV01061', makeup:'Học bù từ PET-1 (Hà Đông)'});
+  roster.forEach((r,i) => { if (S.att[i] === undefined) S.att[i] = r.preset || null; });
+  const done = roster.filter((_,i) => S.att[i]).length;
+  const opts = [['p','Có mặt'],['l','Muộn'],['e','Vắng có phép'],['a','Vắng không phép']];
+  const next = m.next || m.dates[m.dates.length-1];
+  const lockD = toD(next); lockD.setUTCDate(lockD.getUTCDate() + 2);
+  const dn = DAY_LABEL[dayNum(toD(next))];
+  return `
+  <div class="crumbs"><a href="#" data-go="schedule">Lớp & lịch</a> / Điểm danh</div>
+  <div class="page-head">
+    <div><h1>Điểm danh ${c.code}</h1><p>${c.course}, ${dn === 'CN' ? 'Chủ nhật' : 'Thứ ' + ({T2:'Hai',T3:'Ba',T4:'Tư',T5:'Năm',T6:'Sáu',T7:'Bảy'}[dn])} ${vnDate(next)}, ${c.time}, phòng ${c.room}, GV ${esc(c.teacher)}. Buổi ${Math.min(m.held + 1, m.n)}/${m.n}.</p></div>
+    <div class="tools"><button class="btn" data-act="allPresent" data-n="${roster.length}">${ic('ok')}Đánh dấu tất cả có mặt</button></div>
+  </div>
+  ${m.status === 'upcoming' ? `<div class="card empty">${ic('cal')}<h3>Lớp chưa khai giảng</h3><p>Lớp ${c.code} khai giảng ngày ${vnDate(c.start)}, hiện có ${roster.length} học viên.</p></div>` : `
+  <section class="card">
+    <div class="att-head">
+      <div class="field" style="flex:1;min-width:240px"><label for="unit">Nội dung đã dạy</label><input id="unit" class="input" value="Unit ${Math.ceil((m.held + 1) / 3)}: bài học theo giáo trình ${c.course}"></div>
+      <div class="lockline num">${ic('lock')}Tự khóa lúc ${c.time} ngày ${vnDate(isoOf(lockD))} (48 giờ sau buổi học)</div>
+    </div>
+    ${roster.length ? roster.map((r,i) => `<div class="att-row">
+      <span class="idx num">${i+1}</span>
+      <div><b>${esc(r.n)}</b>${r.makeup ? `<span class="flag">${r.makeup}</span>` : ''}${r.preset ? '<div class="note">Phụ huynh báo nghỉ lúc 08:12 hôm nay qua cổng phụ huynh</div>' : ''}</div>
+      <div class="seg" role="radiogroup" aria-label="Điểm danh ${esc(r.n)}">${opts.map(([k,l]) => `<button class="${k} ${S.att[i]===k?'on':''}" role="radio" aria-checked="${S.att[i]===k}" data-act="mark" data-i="${i}" data-k="${k}">${l}</button>`).join('')}</div>
+    </div>`).join('') : '<div class="empty"><p>Lớp chưa có học viên đang học.</p></div>'}
+    <div class="att-foot">
+      <span class="num">${done}/${roster.length} học viên đã điểm danh${done < roster.length ? `, còn ${roster.length - done}` : ''}</span>
+      <div class="tools"><span class="note">Học viên vắng không báo sẽ được nhắn tin cho phụ huynh khi lưu.</span><button class="btn btn-primary" data-act="saveAtt" ${done < roster.length || !roster.length ? 'disabled' : ''}>Lưu điểm danh</button></div>
+    </div>
+  </section>`}`;
+}
+
+/* ---------- approvals ---------- */
+function viewApprovals(){
+  const scope = APPROVALS;
+  const cnt = k => scope.filter(a => a.status === k).length;
+  const list = scope.filter(a => a.status === S.apprTab);
+  if (!list.find(a => a.id === S.apprSel)) S.apprSel = list.length ? list[list.length-1].id : null;
+  const cur = list.find(a => a.id === S.apprSel);
+  const tabs = [['wait','Chờ duyệt'],['back','Đã trả lại'],['done','Đã duyệt']];
+  return `
+  <div class="crumbs"><a href="#" data-go="dashboard">Tổng quan</a> / Phê duyệt</div>
+  <div class="page-head">
+    <div><h1>Yêu cầu chờ duyệt</h1><p>Yêu cầu cũ nhất ở trên cùng. Trả lại bắt buộc ghi góp ý cho người gửi.</p></div>
+    <div class="tabs" role="tablist">${tabs.map(([k,l]) => `<button role="tab" aria-selected="${S.apprTab===k}" class="${S.apprTab===k?'on':''}" data-act="apprTab" data-k="${k}">${l}<span class="badge num">${cnt(k)}</span></button>`).join('')}</div>
+  </div>
+  <div class="md">
+    <section class="card q-list" aria-label="Danh sách yêu cầu">
+      ${list.length ? list.slice().reverse().map(a => `<button class="q-item ${a.id===S.apprSel?'on':''}" data-act="apprSel" data-id="${a.id}">
+        <div class="t"><span>${esc(a.student)}</span><span class="q-type">${a.type}</span></div>
+        <div class="s">${a.id} · ${esc(a.by)} · ${a.at}</div></button>`).join('') : `<div class="empty">${ic('inbox')}<h3>Không còn yêu cầu</h3><p>Mục này đã được xử lý hết.</p></div>`}
+    </section>
+    ${cur ? `<section class="card">
+      <div class="card-head"><div><h2>${cur.type}: ${esc(cur.student)}</h2><div class="note">${cur.id} · ${esc(centerName(cur.center))} · gửi bởi ${esc(cur.by)} lúc ${cur.at}</div></div>
+        <span class="chip ${cur.status==='wait'?'s-pending':cur.status==='back'?'s-stop':'s-active'}">${cur.status==='wait'?'Chờ duyệt':cur.status==='back'?'Đã trả lại':'Đã duyệt'}</span></div>
+      ${cur.feedback ? `<div style="margin:16px 16px 0;padding:12px 14px;border-radius:var(--r);background:var(--danger-soft);color:var(--text);border:1px solid var(--danger)"><b style="color:var(--danger)">Góp ý khi trả lại</b><div>${esc(cur.feedback)}</div></div>` : ''}
+      <dl class="kv"><dt>Lý do</dt><dd>${esc(cur.reason)}</dd><dt>Áp dụng theo</dt><dd>${esc(cur.policy)}</dd></dl>
+      <div class="calc num">${cur.calc.map(r => `<div><span>${r[0]}</span><b>${r[1]}</b></div>`).join('')}</div>
+      ${cur.status === 'wait' ? `<div class="decision">
+        <div class="field"><label for="fb">Góp ý cho người gửi</label>
+          <textarea id="fb" class="input ${S.apprErr?'invalid':''}" placeholder="Bắt buộc khi trả lại, không bắt buộc khi duyệt" data-input="apprNote">${esc(S.apprNote)}</textarea>
+          ${S.apprErr ? `<div class="err" role="alert">${S.apprErr}</div>` : ''}</div>
+        <div class="tools" style="justify-content:flex-end;margin-top:12px"><button class="btn btn-danger" data-act="apprBack">${ic('x')}Trả lại</button><button class="btn btn-primary" data-act="apprOk">${ic('ok')}Duyệt</button></div>
+      </div>
+      <div class="shortcut-line"><span><span class="kbd">J</span> <span class="kbd">K</span> chuyển yêu cầu</span><span><span class="kbd">A</span> duyệt</span><span><span class="kbd">R</span> trả lại</span></div>` : ''}
+    </section>` : '<section class="card empty"><p>Chọn một yêu cầu để xem.</p></section>'}
+  </div>`;
+}
+
+/* ---------- debts ---------- */
+function viewDebts(){
+  const rows = scopeStudents().filter(s => s.debt > 0).map((s,i) => ({...s, due: s.status === 'pending' ? 'Trước khai giảng' : ['15/10/2026','04/10/2026','20/10/2026','28/09/2026','12/10/2026'][i % 5], over: s.status !== 'pending' && [false,true,false,true,false][i % 5]}))
+    .sort((a,b) => (b.over - a.over) || (b.debt - a.debt));
+  const total = rows.reduce((a,r) => a + r.debt, 0);
+  const over = rows.filter(r => r.over);
+  return `
+  <div class="crumbs"><a href="#" data-go="dashboard">Tổng quan</a> / Học phí</div>
+  <div class="page-head"><div><h1>Công nợ</h1><p class="num">${rows.length} học viên còn nợ, tổng ${vnd(total)}. Quá hạn: ${over.length} học viên, ${vnd(over.reduce((a,r)=>a+r.debt,0))}.</p></div>
+    <div class="tools"><button class="btn" data-act="mock" data-msg="Đã xuất danh sách công nợ ra Excel">${ic('dl')}Xuất Excel</button></div></div>
+  ${rows.length ? `<div class="table-wrap"><table class="cards nocbx"><thead><tr><th>Học viên</th><th>Khóa / lớp</th>${S.center==='all' ? '<th>Cơ sở</th>' : ''}<th>Hạn đóng</th><th class="r">Còn nợ</th><th></th></tr></thead><tbody>
+  ${rows.map(r => `<tr data-act="openStudent" data-id="${r.id}"><td class="cell-name"><b>${esc(r.name)}</b><span class="num">${r.id} · PH ${maskPhone(r.phone)}</span></td><td data-label="Khóa / lớp">${r.course}<div class="tag-inline">${r.cls || 'Chưa có lớp'}</div></td>${S.center==='all' ? `<td data-label="Cơ sở">${centerShort(r.center)}</td>` : ''}
+    <td class="num" data-label="Hạn đóng">${r.due} ${r.over ? '<span class="chip s-stop" style="margin-left:6px">Quá hạn</span>' : ''}</td><td class="r num" data-label="Còn nợ" style="font-weight:600">${vnd(r.debt)}</td>
+    <td data-stop class="r">${can('accountant frontdesk manager admin') ? `<button class="btn btn-sm" data-act="collect" data-id="${r.id}">Ghi nhận thu tiền</button>` : ''}</td></tr>`).join('')}
+  </tbody></table></div>` : `<div class="card empty">${ic('wallet')}<h3>Không có công nợ</h3><p>Mọi học viên tại cơ sở này đã đóng đủ học phí.</p></div>`}`;
+}
+function viewPlaceholder(){
+  return `<div class="crumbs"><a href="#" data-go="dashboard">Tổng quan</a> / Báo cáo hợp nhất</div>
+  <div class="card empty">${ic('chart')}<h3>Báo cáo hợp nhất chưa có trong bản xem thử này</h3><p>Màn hình này nằm trong phạm vi giai đoạn 2 và sẽ được dựng ở vòng sau.</p><button class="btn" data-go="dashboard">Về bảng điều khiển</button></div>`;
+}
+
+/* ---------- row menu ---------- */
+function viewRowMenu(){
+  const m = S.menu;
+  let items = [];
+  if (m.kind === 'student'){
+    const s = STUDENTS.find(x => x.id === m.id); if (!s) return '';
+    items = [['openStudent','eye','Xem hồ sơ',true], ['editStudent','edit','Sửa thông tin',can(P.editStudent)],
+      ['collect','wallet','Ghi nhận thu tiền',can(P.money) && s.debt > 0], ['sep'], ['deleteStudent','trash','Xóa hồ sơ',can(P.deleteStudent),'danger']];
+  } else {
+    items = [['openClassStudents','users','Xem học viên trong lớp',true], ['openClass','check','Điểm danh',true], ['editClass','edit','Sửa lớp',can(P.editClass)],
+      ['sep'], ['deleteClass','trash','Xóa lớp',can(P.editClass),'danger']];
+  }
+  items = items.filter(i => i[0] === 'sep' || i[3]);
+  const [center, code] = (m.id || '').split('|');
+  const title = m.kind === 'student' ? (STUDENTS.find(x => x.id === m.id) || {}).name : 'Lớp ' + (m.id || '').split('|')[1];
+  return `<div class="pop fixed" style="left:${m.x}px;top:${m.y}px;min-width:200px" role="menu"><h4 class="only-sm">${esc(title || '')}</h4>${items.map(i => i[0] === 'sep' ? '<div class="pop-sep"></div>' :
+    `<button class="pop-item" role="menuitem" data-act="${i[0]}" data-id="${m.kind === 'student' ? m.id : ''}" data-center="${center}" data-c="${code||''}" style="${i[4] ? 'color:var(--danger)' : ''}">${ic(i[1],'mi')}<b style="font-weight:500">${i[2]}</b></button>`).join('')}</div>`;
+}
+
+/* ---------- modal ---------- */
+const fieldErr = k => S.form && S.form.err && S.form.err[k] ? `<div class="err" role="alert">${S.form.err[k]}</div>` : '';
+const inv = k => S.form && S.form.err && S.form.err[k] ? 'invalid' : '';
+const opt = (v, l, cur, dis) => `<option value="${esc(v)}" ${String(cur) === String(v) ? 'selected' : ''} ${dis ? 'disabled' : ''}>${esc(l)}</option>`;
+function modalShell(title, sub, body, foot, wide){
+  return `<div class="overlay" data-act="closeModal"><div class="modal ${wide ? 'wide' : ''}" role="dialog" aria-modal="true" aria-labelledby="mt" data-stop>
+    <div class="modal-head"><div><h3 id="mt">${title}</h3>${sub ? `<p>${sub}</p>` : ''}</div><button class="btn icon-btn" data-act="closeModal" aria-label="Đóng">${ic('x')}</button></div>
+    <div class="modal-body">${body}</div><div class="modal-foot">${foot}</div></div></div>`;
+}
+function studentFormSummary(f){
+  const pl = enrollPlan(f); if (!pl) return '';
+  const pay = Math.min(pl.fee, +String(f.payNow||'0').replace(/\D/g,'') || 0);
+  return `${pl.late ? `<div class="warnbox" style="margin-bottom:10px">${ic('alert')}<div><b>Vào lớp muộn</b><div>Lớp ${esc(f.cls)} đã học ${pl.held}/${pl.full} buổi. Học viên được ${pl.n} buổi còn lại và học phí tính theo ${pl.n} buổi.</div></div></div>` : ''}<div class="calc num" style="margin:0">
+    <div><span>Số buổi</span><b>${pl.n} buổi${pl.late ? ' (trên ' + pl.full + ')' : ''}</b></div>
+    <div><span>Học phí gốc</span><b>${vnd(pl.gross)}</b></div>
+    ${pl.pct ? `<div><span>Ưu đãi</span><b>− ${vnd(pl.gross - pl.fee)}</b></div>` : ''}
+    <div><span>Đơn giá thực trả</span><b>${vnd(pl.unit)} / buổi</b></div>
+    <div><span>Thu ngay</span><b>${vnd(pay)}</b></div>
+    <div><span>Còn phải thu</span><b style="${pl.fee - pay ? 'color:var(--danger)' : ''}">${vnd(pl.fee - pay)}</b></div></div>`;
+}
+function viewStudentForm(){
+  const f = S.form, edit = f.mode === 'edit';
+  const centers = S.role === 'admin' ? CENTERS : CENTERS.filter(c => c.id === (S.center === 'all' ? 'cg' : S.center));
+  const clsOpts = CLASSES.filter(c => c.center === f.center && c.course === f.course && classMeta(c).status !== 'ended');
+  const dup = f.dup ? `<div class="warnbox">${ic('alert')}<div><b>Có thể trùng hồ sơ</b><div>${esc(f.dup.name)} (${f.dup.id}) có cùng số điện thoại phụ huynh: khóa ${f.dup.course}${f.dup.cls ? ', lớp ' + f.dup.cls : ''}, trạng thái ${STATUS[f.dup.status].label}.</div>
+    <div class="tools" style="margin-top:8px"><button class="btn btn-sm" data-act="openStudent" data-id="${f.dup.id}">Mở hồ sơ cũ</button><button class="btn btn-sm btn-ghost" data-act="ignoreDup">Vẫn tạo hồ sơ mới</button></div></div></div>` : '';
+  const body = `${dup}<div class="form-grid">
+    <div class="form-sec">Học viên</div>
+    <div class="field full"><label for="f-name">Họ và tên <span class="req">*</span></label><input id="f-name" class="input ${inv('name')}" data-field="name" value="${esc(f.name)}" placeholder="Ví dụ: Nguyễn Minh Anh" autocomplete="off">${fieldErr('name')}</div>
+    <div class="field"><label for="f-dob">Ngày sinh</label><input id="f-dob" type="date" class="input" data-field="dob" value="${esc(f.dob)}"></div>
+    <div class="field"><label for="f-note">Ghi chú</label><input id="f-note" class="input" data-field="note" value="${esc(f.note)}" placeholder="Lưu ý khi dạy, người đón…"></div>
+    <div class="form-sec">Phụ huynh / người thanh toán</div>
+    <div class="field"><label for="f-parent">Họ tên phụ huynh <span class="req">*</span></label><input id="f-parent" class="input ${inv('parent')}" data-field="parent" value="${esc(f.parent)}" placeholder="Ví dụ: Chị Trần Thu Hà">${fieldErr('parent')}</div>
+    <div class="field"><label for="f-phone">Số điện thoại <span class="req">*</span></label><input id="f-phone" class="input num ${inv('phone')}" data-field="phone" value="${esc(f.phone)}" inputmode="tel" placeholder="09xx xxx xxx">${fieldErr('phone') || '<span class="hint">Dùng để nhận thông báo và kiểm tra trùng hồ sơ</span>'}</div>
+    ${edit ? `<div class="form-sec">Ghi danh</div><div class="full note">${esc(f.course)}, ${f.cls ? 'lớp ' + esc(f.cls) : 'chưa xếp lớp'}, ${esc(centerName(f.center))}. Đổi khóa, lớp hoặc cơ sở dùng thao tác <b>Chuyển lớp</b> để số buổi và học phí được ghi vào sổ phát sinh.</div>` : `
+    <div class="form-sec">Ghi danh</div>
+    <div class="field"><label for="f-center">Cơ sở <span class="req">*</span></label><select id="f-center" class="input" data-field="center">${centers.map(c => opt(c.id, c.name, f.center)).join('')}</select></div>
+    <div class="field"><label for="f-course">Khóa học <span class="req">*</span></label><select id="f-course" class="input ${inv('course')}" data-field="course">${opt('', 'Chọn khóa', f.course)}${COURSES.map(c => opt(c, `${c} · ${COURSE_INFO[c].n} buổi`, f.course)).join('')}</select>${fieldErr('course')}</div>
+    <div class="field"><label for="f-cls">Lớp</label><select id="f-cls" class="input" data-field="cls" ${!f.course ? 'disabled' : ''}>${opt('', f.course ? 'Chờ xếp lớp' : 'Chọn khóa trước', f.cls)}${clsOpts.map(c => { const n = enrolledIn(c), full = n >= c.max; return opt(c.code, `${c.code} · ${daysText(c)} · ${n}/${c.max}${full ? ' (đã đủ)' : ''}`, f.cls, full); }).join('')}</select>
+      <span class="hint">${f.course && !clsOpts.length ? 'Cơ sở chưa có lớp ' + esc(f.course) + ' đang mở, học viên sẽ ở trạng thái Chờ xếp lớp' : 'Để trống nếu chưa xếp được lớp'}</span></div>
+    <div class="field"><label for="f-disc">Ưu đãi</label><select id="f-disc" class="input" data-field="discount">${DISCOUNTS.map(d => opt(d.id, d.label, f.discount)).join('')}</select></div>
+    <div class="field"><label for="f-pay">Thu ngay (đ)</label><input id="f-pay" class="input num ${inv('payNow')}" data-field="payNow" value="${esc(f.payNow)}" inputmode="numeric" placeholder="0">${fieldErr('payNow')}</div>
+    <div class="field full">${studentFormSummary(f)}</div>`}
+  </div>`;
+  return modalShell(edit ? 'Sửa thông tin học viên' : 'Ghi danh mới', edit ? `${esc(f.id)} · thay đổi được ghi vào nhật ký` : 'Tạo hồ sơ học viên và ghi danh vào khóa học', body,
+    `<button class="btn btn-ghost" data-act="closeModal">Hủy</button><button class="btn btn-primary" data-act="saveStudent">${edit ? 'Lưu thay đổi' : 'Ghi danh'}</button>`, true);
+}
+function viewClassForm(){
+  const f = S.form, edit = f.mode === 'edit';
+  const locked = edit && f.enrolled > 0;
+  const center = f.center;
+  const {dates, skipped} = sessionDates(f.start, f.days, (COURSE_INFO[f.course]||{n:0}).n);
+  const conflicts = classConflicts(f);
+  const body = `<div class="form-grid">
+    <div class="field"><label for="c-center">Cơ sở <span class="req">*</span></label><select id="c-center" class="input" data-field="center" ${locked || S.role !== 'admin' ? 'disabled' : ''}>${CENTERS.map(c => opt(c.id, c.name, center)).join('')}</select></div>
+    <div class="field"><label for="c-course">Khóa học <span class="req">*</span></label><select id="c-course" class="input ${inv('course')}" data-field="course" ${locked ? 'disabled' : ''}>${opt('', 'Chọn khóa', f.course)}${COURSES.map(c => opt(c, `${c} · ${COURSE_INFO[c].n} buổi`, f.course)).join('')}</select>${locked ? '<span class="hint">Lớp đã có ' + f.enrolled + ' học viên nên không đổi được khóa</span>' : fieldErr('course')}</div>
+    <div class="field"><label for="c-code">Mã lớp <span class="req">*</span></label><input id="c-code" class="input ${inv('code')}" data-field="code" value="${esc(f.code)}" ${edit ? 'disabled' : ''}>${fieldErr('code') || (edit ? '' : '<span class="hint">Gợi ý tự động theo khóa, có thể sửa</span>')}</div>
+    <div class="field"><label for="c-start">Ngày khai giảng <span class="req">*</span></label><input id="c-start" type="date" class="input ${inv('start')}" data-field="start" value="${esc(f.start)}">${fieldErr('start')}</div>
+    <div class="field full"><label>Ngày học trong tuần <span class="req">*</span></label>
+      <div class="days" role="group" aria-label="Ngày học">${[2,3,4,5,6,7,8].map(d => `<button type="button" class="${f.days.includes(d)?'on':''}" data-act="toggleDay" data-d="${d}" aria-pressed="${f.days.includes(d)}">${DAY_LABEL[d]}</button>`).join('')}</div>${fieldErr('days')}</div>
+    <div class="field"><label for="c-time">Giờ học <span class="req">*</span></label><select id="c-time" class="input" data-field="time">${TIMES.map(t => opt(t, t + ' – ' + addMin(t, 90), f.time)).join('')}</select></div>
+    <div class="field"><label for="c-room">Phòng <span class="req">*</span></label><select id="c-room" class="input" data-field="room">${ROOMS[center].map(r => opt(r, r, f.room)).join('')}</select></div>
+    <div class="field full"><label for="c-teacher">Giáo viên <span class="req">*</span></label><select id="c-teacher" class="input" data-field="teacher">${TEACHERS[center].map(t => opt(t, t, f.teacher)).join('')}</select></div>
+    <div class="field"><label for="c-min">Sĩ số tối thiểu để mở lớp</label><input id="c-min" type="number" min="1" class="input num" data-field="min" value="${esc(f.min)}"></div>
+    <div class="field"><label for="c-max">Sĩ số tối đa</label><input id="c-max" type="number" min="1" class="input num ${inv('max')}" data-field="max" value="${esc(f.max)}">${fieldErr('max')}</div>
+    ${conflicts.length ? `<div class="full dangerbox" role="alert">${ic('alert')}<div><b>Trùng lịch</b>${conflicts.map(c => `<div>${c}</div>`).join('')}</div></div>` : ''}
+    ${f.course && f.days.length && f.start ? `<div class="full calc num" style="margin:0">
+      <div><span>Số buổi theo khóa</span><b>${dates.length} buổi, ${f.days.length} buổi/tuần</b></div>
+      <div><span>Buổi đầu tiên</span><b>${vnDate(dates[0])}</b></div>
+      <div><span>Bỏ qua ngày nghỉ</span><b>${skipped} ngày</b></div>
+      <div><span>Kết thúc dự kiến</span><b>${vnDate(dates[dates.length-1])}</b></div></div>` : ''}
+  </div>`;
+  return modalShell(edit ? `Sửa lớp ${esc(f.code)}` : 'Mở lớp mới', edit ? (f.enrolled ? `${f.enrolled} học viên đang học, đổi lịch áp dụng từ buổi kế tiếp` : 'Lớp chưa có học viên') : 'Hệ thống tự sinh lịch học và bỏ qua ngày nghỉ', body,
+    `<button class="btn btn-ghost" data-act="closeModal">Hủy</button><button class="btn btn-primary" data-act="saveClass" ${conflicts.length ? 'disabled' : ''}>${edit ? 'Lưu thay đổi' : 'Mở lớp'}</button>`, true);
+}
+const addMin = (t, m) => { const [h, mi] = t.split(':').map(Number); const x = h * 60 + mi + m; return String(Math.floor(x/60)).padStart(2,'0') + ':' + String(x%60).padStart(2,'0'); };
+function classConflicts(f){
+  if (!f.days.length || !f.start || !f.course) return [];
+  const mine = sessionDates(f.start, f.days, COURSE_INFO[f.course].n).dates;
+  if (!mine.length) return [];
+  const a0 = mine[0], a1 = mine[mine.length-1];
+  const out = [];
+  CLASSES.forEach(c => {
+    if (f.mode === 'edit' && c.center === f.origCenter && c.code === f.origCode) return;
+    if (c.time !== f.time || !c.days.some(d => f.days.includes(d))) return;
+    const m = classMeta(c); if (m.end < a0 || c.start > a1) return;
+    const dd = c.days.filter(d => f.days.includes(d)).map(d => DAY_LABEL[d]).join(', ');
+    if (c.center === f.center && c.room === f.room) out.push(`Phòng ${c.room} đã có lớp ${c.code} vào ${dd} lúc ${c.time}.`);
+    if (c.teacher === f.teacher) out.push(`${c.teacher} đang dạy ${c.code}${c.center !== f.center ? ' (' + centerShort(c.center) + ')' : ''} vào ${dd} lúc ${c.time}.`);
+  });
+  return out;
+}
+function viewModal(){
+  const m = S.modal;
+  if (m.type === 'studentForm') return viewStudentForm();
+  if (m.type === 'classForm') return viewClassForm();
+  if (m.type === 'confirm'){
+    return `<div class="overlay" data-act="closeModal"><div class="modal" role="alertdialog" aria-modal="true" aria-labelledby="mt" data-stop>
+      <div class="modal-body" style="flex-direction:row;gap:14px;padding-top:20px"><div class="confirm-ico">${ic(m.icon || 'trash')}</div>
+        <div><h3 id="mt" style="margin:0 0 6px;font-size:16px">${m.title}</h3><div class="note" style="font-size:13.5px;color:var(--text)">${m.text}</div>
+        ${m.reason ? `<div class="field" style="margin-top:12px"><label for="cr">${m.reason}</label><textarea id="cr" class="input ${S.form && S.form.err && S.form.err.reason ? 'invalid' : ''}" data-field="reason" placeholder="${m.reasonPh || ''}">${esc((S.form && S.form.reason) || '')}</textarea>${fieldErr('reason')}</div>` : ''}</div></div>
+      <div class="modal-foot"><button class="btn btn-ghost" data-act="closeModal">${m.blocked ? 'Đóng' : 'Hủy'}</button>${m.alt ? `<button class="btn" data-act="${m.alt.act}" data-id="${m.id||''}">${m.alt.label}</button>` : ''}${m.ok ? `<button class="btn ${m.danger ? 'btn-solid-danger' : 'btn-primary'}" data-act="${m.ok.act}" data-id="${m.id||''}">${m.ok.label}</button>` : ''}</div>
+    </div></div>`;
+  }
+  if (m.type === 'refund'){
+    const s = STUDENTS.find(x => x.id === m.id);
+    const mm = money(s), rem = s.total - s.used;
+    const val = rem * mm.unit, claw = Math.round(rem * (mm.unit * mm.pct / (100 - mm.pct || 100))), fee = Math.round(val * 0.1), out = mm.paid - mm.earned - claw - fee;
+    const body = `<div class="calc num" style="margin:0">
+          <div><span>Phụ huynh đã đóng</span><b>${vnd(mm.paid)}</b></div>
+          <div><span>− Giá trị ${s.used} buổi đã trừ (× ${vnd(mm.unit)})</span><b>${vnd(mm.earned)}</b></div>
+          <div><span>− Thu hồi ưu đãi trên ${rem} buổi còn lại</span><b>${vnd(claw)}</b></div>
+          <div><span>− Phí xử lý 10% phần còn lại</span><b>${vnd(fee)}</b></div>
+          <div><span>${out >= 0 ? 'Số tiền hoàn dự kiến' : 'Không có tiền hoàn. Phụ huynh còn phải đóng'}</span><b style="${out < 0 ? 'color:var(--danger)' : ''}">${vnd(Math.abs(out))}</b></div>
+        </div>
+        ${out < 0 ? `<p class="note" style="margin:0">Học viên đã học vượt số tiền đã đóng. Nếu vẫn ngừng học, yêu cầu sẽ chuyển thành khoản phải thu thay vì phiếu chi.</p>` : ''}
+        <div class="field"><label for="rr">Lý do</label><textarea id="rr" class="input ${m.err ? 'invalid' : ''}" data-input="refundReason" placeholder="Ví dụ: gia đình chuyển nơi ở">${esc(m.reason||'')}</textarea>${m.err ? `<div class="err" role="alert">${m.err}</div>` : ''}</div>
+        <p class="note" style="margin:0">Sau khi quản lý cơ sở duyệt, kế toán chi tiền và ${rem} buổi được trừ khỏi sổ trong cùng một thao tác.</p>`;
+    return modalShell('Yêu cầu hoàn phí', `${esc(s.name)} · ${s.course} ${s.cls} · chính sách hoàn phí v3`, body,
+      `<button class="btn btn-ghost" data-act="closeModal">Hủy</button><button class="btn btn-primary" data-act="submitRefund">Gửi yêu cầu duyệt</button>`);
+  }
+  if (m.type === 'collect'){
+    const s = STUDENTS.find(x => x.id === m.id);
+    const body = `<div class="field"><label for="amt">Số tiền</label><input id="amt" class="input num ${S.form && S.form.err && S.form.err.amt ? 'invalid' : ''}" data-field="amt" value="${esc(S.form ? S.form.amt : fmt(s.debt))}" inputmode="numeric">${fieldErr('amt')}</div>
+        <div class="field"><label for="pm">Hình thức</label><select id="pm" class="input"><option>Chuyển khoản</option><option>Tiền mặt</option><option>Quẹt thẻ</option></select></div>
+        <p class="note" style="margin:0">Phiếu thu không xóa được. Nếu nhập sai, hủy trong ngày kèm lý do hoặc lập phiếu điều chỉnh.</p>`;
+    return modalShell('Ghi nhận thu tiền', `${esc(s.name)} · còn nợ ${vnd(s.debt)}`, body,
+      `<button class="btn btn-ghost" data-act="closeModal">Hủy</button><button class="btn btn-primary" data-act="doCollect" data-id="${s.id}">Lập phiếu thu</button>`);
+  }
+  return '';
+}
+
+/* vào lớp muộn: chỉ tính các buổi còn lại của lớp */
+function enrollPlan(f){
+  const info = COURSE_INFO[f.course]; if (!info) return null;
+  const c = f.cls ? findClass(f.center, f.cls) : null;
+  const m = c ? classMeta(c) : null;
+  const late = m && m.status === 'running' && m.held > 0;
+  const n = late ? m.n - m.held : info.n;
+  const pct = (DISCOUNTS.find(d => d.id === f.discount) || DISCOUNTS[0]).pct;
+  const gross = n * info.u, fee = Math.round(gross * (100 - pct) / 100);
+  return {n, late, held: m ? m.held : 0, full:info.n, gross, fee, pct, unit: Math.round(fee / n)};
+}
+/* ================= actions: học viên ================= */
+function openStudentForm(id){
+  if (id){
+    const s = STUDENTS.find(x => x.id === id);
+    S.form = {mode:'edit', id:s.id, name:s.name, dob:s.dob, note:s.note, parent:s.parent, phone:s.phone, center:s.center, course:s.course, cls:s.cls, err:{}};
+  } else {
+    S.form = {mode:'add', name:'', dob:'', note:'', parent:'', phone:'', center: S.center === 'all' ? 'cg' : S.center, course:'', cls:'', discount:'none', payNow:'', err:{}};
+  }
+  S.modal = {type:'studentForm'}; S.menu = null; render();
+  setTimeout(() => { const el = document.getElementById('f-name'); el && el.focus(); });
+}
+function saveStudent(){
+  const f = S.form, err = {};
+  const phone = String(f.phone).replace(/\D/g,'');
+  if (f.name.trim().split(/\s+/).length < 2) err.name = 'Nhập đầy đủ họ và tên (ít nhất 2 chữ).';
+  if (!f.parent.trim()) err.parent = 'Nhập tên phụ huynh hoặc người thanh toán.';
+  if (!/^0\d{9}$/.test(phone)) err.phone = 'Số điện thoại gồm 10 chữ số, bắt đầu bằng 0.';
+  if (f.mode === 'add'){
+    if (!f.course) err.course = 'Chọn khóa học.';
+    const info = COURSE_INFO[f.course];
+    const pay = +String(f.payNow||'0').replace(/\D/g,'') || 0;
+    if (info){ const fee = enrollPlan(f).fee; if (pay > fee) err.payNow = 'Số tiền thu lớn hơn học phí phải đóng (' + vnd(fee) + ').'; }
+  }
+  f.err = err;
+  if (Object.keys(err).length){ render(); const first = document.querySelector('.modal .invalid'); first && first.focus(); return; }
+  if (f.mode === 'add' && !f.ignoreDup){
+    const dup = STUDENTS.find(s => s.phone === phone);
+    if (dup){ f.dup = dup; render(); document.querySelector('.modal').scrollTop = 0; return; }
+  }
+  if (f.mode === 'edit'){
+    const s = STUDENTS.find(x => x.id === f.id);
+    const changed = ['name','dob','note','parent'].filter(k => s[k] !== f[k]).length + (s.phone !== phone ? 1 : 0);
+    Object.assign(s, {name:f.name.trim(), dob:f.dob, note:f.note.trim(), parent:f.parent.trim(), phone});
+    S.modal = null; S.form = null;
+    toast(changed ? `Đã lưu ${changed} thay đổi cho ${s.name}` : 'Không có thay đổi nào'); return;
+  }
+  const pl = enrollPlan(f), pay = +String(f.payNow||'0').replace(/\D/g,'') || 0;
+  const fee = pl.fee;
+  const s = {id:nextId(), name:f.name.trim(), course:f.course, cls:f.cls, center:f.center, total:pl.n, lateFrom: pl.late ? pl.held + 1 : 0, used:0, credit:0, status: f.cls ? 'active' : 'pending',
+    debt: fee - pay, paid: pay, phone, parent:f.parent.trim(), dob:f.dob, discount:f.discount, note:f.note.trim(), created:TODAY};
+  STUDENTS.unshift(s);
+  S.modal = null; S.form = null; S.route = 'students'; S.q = ''; S.fStatus = []; S.fCourse = []; S.fLow = false; S.page = 1; S.flash = s.id;
+  toast(`Đã ghi danh ${s.name}${s.cls ? ' vào lớp ' + s.cls : ' (chờ xếp lớp)'}`, 'Xem hồ sơ', () => { S.detailId = s.id; go('detail'); });
+}
+function deleteStudent(id){
+  const s = STUDENTS.find(x => x.id === id); const mm = money(s);
+  S.menu = null; S.form = {reason:'', err:{}};
+  if (s.used > 0 || mm.paid > 0){
+    const parts = [s.used ? `${s.used} buổi đã trừ` : '', mm.paid ? `${vnd(mm.paid)} đã thu` : ''].filter(Boolean).join(' và ');
+    S.modal = {type:'confirm', blocked:true, icon:'lock', id, title:`Không thể xóa hồ sơ ${esc(s.name)}`,
+      text:`Hồ sơ đã có ${parts} trong sổ phát sinh. Xóa sẽ làm mất lịch sử đối soát học phí và điểm danh, nên hệ thống chỉ cho chuyển hồ sơ sang trạng thái Ngừng học.`,
+      ...(s.status !== 'stop' && s.status !== 'done' ? {reason:'Lý do ngừng học', reasonPh:'Ví dụ: gia đình chuyển nơi ở', ok:{act:'stopStudent', label:'Chuyển sang Ngừng học'}} : {})};
+  } else {
+    S.modal = {type:'confirm', danger:true, id, title:`Xóa hồ sơ ${esc(s.name)}?`,
+      text:`Hồ sơ ${s.id} chưa có buổi học hay phiếu thu nào nên có thể xóa. Thao tác được ghi vào nhật ký; bạn có thể hoàn tác trong vài giây.`,
+      ok:{act:'confirmDeleteStudent', label:'Xóa hồ sơ'}};
+  }
+  render();
+}
+
+/* ================= actions: lớp ================= */
+function suggestCode(center, course){
+  if (!course) return '';
+  const p = COURSE_INFO[course].code;
+  let n = 1; while (CLASSES.some(c => c.center === center && c.code === `${p}-${n}`)) n++;
+  return `${p}-${n}`;
+}
+function openClassForm(key){
+  if (key){
+    const [center, code] = key.split('|'); const c = findClass(center, code);
+    S.form = {mode:'edit', origCenter:center, origCode:code, center, code, course:c.course, days:c.days.slice(), time:c.time, room:c.room, teacher:c.teacher, min:c.min, max:c.max, start:c.start, enrolled:enrolledIn(c), err:{}};
+  } else {
+    const center = S.center === 'all' ? 'cg' : S.center;
+    S.form = {mode:'add', center, code:'', course:'', days:[3,5], time:'17:45', room:ROOMS[center][0], teacher:TEACHERS[center][0], min:6, max:14, start:'2026-10-27', err:{}};
+  }
+  S.modal = {type:'classForm'}; S.menu = null; render();
+}
+function saveClass(){
+  const f = S.form, err = {};
+  if (!f.course) err.course = 'Chọn khóa học.';
+  if (!String(f.code).trim()) err.code = 'Nhập mã lớp.';
+  else if (f.mode === 'add' && CLASSES.some(c => c.center === f.center && c.code.toLowerCase() === f.code.trim().toLowerCase())) err.code = 'Mã lớp đã tồn tại tại cơ sở này.';
+  if (!f.days.length) err.days = 'Chọn ít nhất một ngày học.';
+  if (!f.start) err.start = 'Chọn ngày khai giảng.';
+  if (+f.max < +f.min) err.max = 'Sĩ số tối đa phải lớn hơn hoặc bằng sĩ số tối thiểu.';
+  if (f.mode === 'edit' && +f.max < f.enrolled) err.max = `Lớp đang có ${f.enrolled} học viên, không thể giảm xuống ${f.max}.`;
+  f.err = err;
+  if (Object.keys(err).length || classConflicts(f).length){ render(); return; }
+  const data = {center:f.center, code:f.code.trim().toUpperCase(), course:f.course, days:f.days.slice().sort((a,b)=>a-b), time:f.time, room:f.room, teacher:f.teacher, min:+f.min, max:+f.max, start:f.start, target:0};
+  if (f.mode === 'edit'){ Object.assign(findClass(f.origCenter, f.origCode), data); S.modal = null; S.form = null; S.flash = data.center + data.code; toast(`Đã lưu lớp ${data.code}`); return; }
+  CLASSES.push(data);
+  S.modal = null; S.form = null; S.route = 'classes'; S.cStatus = 'all'; S.cq = data.code; S.flash = data.center + data.code;
+  toast(`Đã mở lớp ${data.code}, khai giảng ${vnDate(data.start)}`);
+}
+function deleteClass(key){
+  const [center, code] = key.split('|'); const c = findClass(center, code); const n = enrolledIn(c);
+  const pend = STUDENTS.filter(s => s.center === center && s.cls === code).length;
+  S.menu = null; S.form = {err:{}};
+  if (n > 0){
+    S.modal = {type:'confirm', blocked:true, icon:'lock', id:key, title:`Không thể xóa lớp ${code}`,
+      text:`Lớp còn ${n} học viên đang học hoặc bảo lưu. Chuyển các học viên sang lớp khác trước, sau đó mới xóa được lớp.`, alt:{act:'openClassStudents', label:'Xem học viên trong lớp'}};
+  } else if (pend > 0 || classMeta(c).held > 0){
+    S.modal = {type:'confirm', blocked:true, icon:'lock', id:key, title:`Không thể xóa lớp ${code}`,
+      text:`Lớp đã có ${classMeta(c).held} buổi học và ${pend} hồ sơ học viên đã hoàn thành hoặc ngừng học gắn với lớp. Lớp được giữ lại để tra cứu lịch sử.`};
+  } else {
+    S.modal = {type:'confirm', danger:true, id:key, title:`Xóa lớp ${code}?`, text:`Lớp ${code} (${c.course}, ${daysText(c)}) chưa có học viên và chưa có buổi học nào. Lịch đã sinh cho lớp sẽ bị gỡ khỏi thời khóa biểu.`, ok:{act:'confirmDeleteClass', label:'Xóa lớp'}};
+  }
+  render();
+}
+
+/* ================= events ================= */
+let toastTimer, toastFn = null;
+function toast(msg, label, fn){
+  S.toast = {msg, label}; toastFn = fn || null; render();
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => { S.toast = null; toastFn = null; S.flash = null; render(); }, label ? 6000 : 2800);
+}
+function go(r){
+  S.pop = null; S.menu = null; S.navOpen = false; S.selected.clear();
+  if (r === 'enroll'){ S.route = 'students'; openStudentForm(); return; }
+  S.route = r; render(); const m = document.getElementById('main'); if (m) m.scrollTop = 0;
+}
+const SELECT_FIELDS = ['center','course','cls','discount','time','room','teacher','start','min','max','dob'];
+document.addEventListener('click', e => {
+  const t = e.target.closest('[data-act],[data-go],[data-pop]');
+  if (S.menu && !e.target.closest('.pop.fixed') && !(t && t.dataset.act === 'rowMenu')) { S.menu = null; if (!t){ render(); return; } }
+  if (S.pop && !e.target.closest('.pop') && !(t && t.dataset.pop)) { S.pop = null; if (!t) { render(); return; } }
+  if (!t) return;
+  if (t.dataset.pop){ e.preventDefault(); S.pop = S.pop === t.dataset.pop ? null : t.dataset.pop; render(); const inp = document.querySelector('.pop [data-input]'); if (inp) inp.focus(); return; }
+  if (t.dataset.go){ e.preventDefault(); S.modal = null; go(t.dataset.go); return; }
+  const a = t.dataset.act;
+  if (e.target.closest('[data-stop]') && t.tagName === 'TR') return;
+  switch (a){
+    case 'noop': e.preventDefault(); break;
+    case 'closePop': S.pop = null; S.menu = null; render(); break;
+    case 'toggleNav': S.navOpen = !S.navOpen; render(); break;
+    case 'toggleGroup': S.closedGroups[t.dataset.g] = !S.closedGroups[t.dataset.g]; render(); break;
+    case 'setTheme': S.theme = t.dataset.t; store('ecms-theme', S.theme); S.pop = null; render(); break;
+    case 'setRole': S.role = t.dataset.role; S.center = S.role === 'admin' ? 'all' : 'cg'; S.pop = null; S.selected.clear(); S.q = ''; S.cq = ''; S.fStatus = []; S.fCourse = []; S.fLow = false; S.page = 1; S.cpage = 1; render(); toast('Đang xem với vai trò ' + ROLES[S.role].name); break;
+    case 'setCenter': if (t.disabled) return; S.center = t.dataset.c; S.pop = null; S.page = 1; S.cpage = 1; render(); break;
+    case 'kpi': { const f = JSON.parse(t.dataset.f || '{}'); S.fStatus = f.fStatus || []; S.fCourse = []; S.fLow = !!f.fLow; S.q = ''; S.page = 1; S.cStatus = t.dataset.go2 === 'classes' ? 'under' : 'all'; go(t.dataset.go2); break; }
+    case 'toggleF': { const arr = t.dataset.f === 'fStatus' ? S.fStatus : S.fCourse; const v = t.dataset.v; const i = arr.indexOf(v); i >= 0 ? arr.splice(i,1) : arr.push(v); S.page = 1; render(); break; }
+    case 'toggleLow': S.fLow = !S.fLow; S.page = 1; render(); break;
+    case 'clearF': S.fStatus = []; S.fCourse = []; S.fLow = false; S.q = ''; S.page = 1; S.pop = null; render(); break;
+    case 'sSize': S.size = +t.dataset.n; S.page = 1; render(); break;
+    case 'sPage': if (!t.disabled){ S.page = +t.dataset.n; render(); document.getElementById('main').scrollTop = 0; } break;
+    case 'cSize': S.size = +t.dataset.n; S.cpage = 1; render(); break;
+    case 'cPage': if (!t.disabled){ S.cpage = +t.dataset.n; render(); } break;
+    case 'cTab': S.cStatus = t.dataset.k; S.cpage = 1; render(); break;
+    case 'check': e.stopPropagation(); S.selected.has(t.dataset.id) ? S.selected.delete(t.dataset.id) : S.selected.add(t.dataset.id); render(); break;
+    case 'checkAll': { const rows = filtered().slice((S.page-1)*S.size, S.page*S.size); const all = rows.every(r => S.selected.has(r.id)); rows.forEach(r => all ? S.selected.delete(r.id) : S.selected.add(r.id)); render(); break; }
+    case 'clearSel': S.selected.clear(); render(); break;
+    case 'bulk': { const msg = t.dataset.msg; S.selected.clear(); toast(msg); break; }
+    case 'rowMenu': {
+      e.stopPropagation();
+      if (S.menu && S.menu.id === t.dataset.id){ S.menu = null; render(); break; }
+      const r = t.getBoundingClientRect(); const h = t.dataset.kind === 'student' ? 200 : 190;
+      S.menu = {kind:t.dataset.kind, id:t.dataset.id, x: Math.max(8, r.right - 210), y: r.bottom + h + 8 > window.innerHeight ? r.top - h - 4 : r.bottom + 4};
+      render(); break; }
+    case 'openStudent': S.modal = null; S.form = null; S.detailId = t.dataset.id; go('detail'); break;
+    case 'editStudent': openStudentForm(t.dataset.id); break;
+    case 'deleteStudent': deleteStudent(t.dataset.id); break;
+    case 'openStudentForm': openStudentForm(); break;
+    case 'saveStudent': saveStudent(); break;
+    case 'ignoreDup': S.form.ignoreDup = true; S.form.dup = null; saveStudent(); break;
+    case 'confirmDeleteStudent': {
+      const i = STUDENTS.findIndex(x => x.id === t.dataset.id); const [s] = STUDENTS.splice(i, 1);
+      S.modal = null; S.form = null; if (S.route === 'detail') S.route = 'students';
+      toast(`Đã xóa hồ sơ ${s.name}`, 'Hoàn tác', () => { STUDENTS.splice(i, 0, s); S.flash = s.id; toast(`Đã khôi phục hồ sơ ${s.name}`); });
+      break; }
+    case 'stopStudent': {
+      if (!S.form.reason.trim()){ S.form.err = {reason:'Nhập lý do để lưu vào hồ sơ và báo cáo giữ chân học viên.'}; render(); document.getElementById('cr').focus(); return; }
+      const s = STUDENTS.find(x => x.id === t.dataset.id); s.status = 'stop'; s.note = 'Ngừng học: ' + S.form.reason.trim();
+      S.modal = null; S.form = null; toast(`Đã chuyển ${s.name} sang Ngừng học`); break; }
+    case 'openClassForm': openClassForm(); break;
+    case 'editClass': openClassForm(t.dataset.center + '|' + t.dataset.c); break;
+    case 'deleteClass': deleteClass(t.dataset.center + '|' + t.dataset.c); break;
+    case 'saveClass': saveClass(); break;
+    case 'toggleDay': { const d = +t.dataset.d, i = S.form.days.indexOf(d); i >= 0 ? S.form.days.splice(i,1) : S.form.days.push(d); S.form.err.days = ''; render(); break; }
+    case 'confirmDeleteClass': {
+      const [center, code] = t.dataset.id.split('|'); const i = CLASSES.findIndex(c => c.center === center && c.code === code); const [c] = CLASSES.splice(i, 1);
+      S.modal = null; S.form = null;
+      toast(`Đã xóa lớp ${code}`, 'Hoàn tác', () => { CLASSES.splice(i, 0, c); S.flash = center + code; toast(`Đã khôi phục lớp ${code}`); });
+      break; }
+    case 'openClassStudents': {
+      const [center, code] = t.dataset.id && t.dataset.id.includes('|') ? t.dataset.id.split('|') : [t.dataset.center, t.dataset.c];
+      S.modal = null; S.form = null; S.q = code; S.fStatus = []; S.fCourse = []; S.fLow = false; S.page = 1;
+      if (S.center !== 'all' && S.center !== center && S.role === 'admin') S.center = center;
+      go('students'); break; }
+    case 'toastAction': { const fn = toastFn; S.toast = null; toastFn = null; fn && fn(); break; }
+    case 'mock': toast(t.dataset.msg); break;
+    case 'refund': S.modal = {type:'refund', id:t.dataset.id}; render(); setTimeout(() => { const f = document.getElementById('rr'); f && f.focus(); }); break;
+    case 'collect': e.stopPropagation(); S.menu = null; { const s = STUDENTS.find(x => x.id === t.dataset.id); S.form = {amt:fmt(s.debt), err:{}}; } S.modal = {type:'collect', id:t.dataset.id}; render(); break;
+    case 'closeModal': if (e.target === t || t.tagName === 'BUTTON'){ S.modal = null; S.form = null; render(); } break;
+    case 'submitRefund': {
+      if (!(S.modal.reason || '').trim()){ S.modal.err = 'Nhập lý do hoàn phí để quản lý có căn cứ duyệt.'; render(); document.getElementById('rr').focus(); return; }
+      const s = STUDENTS.find(x => x.id === S.modal.id);
+      APPROVALS.push({id:'YC-' + (2042 + APPROVALS.length), type:'Hoàn phí', student:s.name, center:s.center, by:ROLES[S.role].user, at:'Vừa xong', status:'wait', reason:S.modal.reason, policy:'Chính sách hoàn phí v3 (hiệu lực 01/06/2026)', calc:[['Số buổi còn lại', (s.total-s.used) + ' buổi']]});
+      S.modal = null; toast('Đã gửi yêu cầu hoàn phí cho quản lý cơ sở'); break; }
+    case 'doCollect': {
+      const s = STUDENTS.find(x => x.id === t.dataset.id); const amt = +String(S.form.amt).replace(/\D/g,'') || 0;
+      if (!amt || amt > s.debt){ S.form.err = {amt: !amt ? 'Nhập số tiền thu.' : 'Số tiền lớn hơn khoản còn nợ (' + vnd(s.debt) + ').'}; render(); return; }
+      s.debt -= amt; if (s.paid !== undefined) s.paid += amt; S.modal = null; S.form = null; toast('Đã lập phiếu thu ' + vnd(amt)); break; }
+    case 'openClass': S.attClass = {center:t.dataset.center || 'cg', code:t.dataset.c}; S.att = {}; S.modal = null;
+      if (!allowedRoutes().includes('attendance')){ toast('Vai trò này không điểm danh. Mở danh sách học viên của lớp.'); S.q = t.dataset.c; go('students'); break; }
+      go('attendance'); break;
+    case 'mark': S.att[t.dataset.i] = t.dataset.k; render(); break;
+    case 'allPresent': for (let i = 0; i < +t.dataset.n; i++){ if (!S.att[i]) S.att[i] = 'p'; } render(); break;
+    case 'saveAtt': { const ab = Object.values(S.att).filter(v => v === 'a').length; toast(ab ? `Đã lưu điểm danh, đã nhắn ${ab} phụ huynh về việc vắng mặt` : 'Đã lưu điểm danh'); break; }
+    case 'apprTab': S.apprTab = t.dataset.k; S.apprSel = null; S.apprErr = ''; S.apprNote = ''; render(); break;
+    case 'apprSel': S.apprSel = t.dataset.id; S.apprErr = ''; S.apprNote = ''; render(); break;
+    case 'apprOk': decide('done'); break;
+    case 'apprBack': decide('back'); break;
+  }
+});
+function decide(kind){
+  const a = APPROVALS.find(x => x.id === S.apprSel);
+  if (!a) return;
+  if (kind === 'back' && !S.apprNote.trim()){ S.apprErr = 'Ghi góp ý trước khi trả lại để người gửi biết cần sửa gì.'; render(); document.getElementById('fb').focus(); return; }
+  a.status = kind; if (kind === 'back') a.feedback = S.apprNote;
+  S.apprErr = ''; S.apprNote = ''; S.apprSel = null;
+  toast(kind === 'done' ? `Đã duyệt ${a.id}` : `Đã trả lại ${a.id} cho ${a.by}`);
+}
+document.addEventListener('input', e => {
+  const fld = e.target.dataset.field;
+  if (fld && S.form){
+    S.form[fld] = e.target.value;
+    if (S.form.err && S.form.err[fld]){ S.form.err[fld] = ''; e.target.classList.remove('invalid'); const er = e.target.parentNode.querySelector('.err'); er && er.remove(); }
+    if (fld === 'payNow' && S.modal && S.modal.type === 'studentForm'){ const box = e.target.closest('.form-grid').querySelector('.field.full:last-child'); if (box) box.innerHTML = studentFormSummary(S.form); }
+    if (fld === 'phone' && S.form.dup){ S.form.dup = null; }
+    return;
+  }
+  const k = e.target.dataset.input;
+  if (!k) return;
+  if (k === 'q' || k === 'cq'){ S[k] = e.target.value; S.page = 1; S.cpage = 1; const pos = e.target.selectionStart; render(); const el = document.querySelector(`[data-input="${k}"]`); el.focus(); el.setSelectionRange(pos,pos); }
+  if (k === 'apprNote'){ S.apprNote = e.target.value; if (S.apprErr && S.apprNote.trim()){ S.apprErr = ''; e.target.classList.remove('invalid'); const er = e.target.parentNode.querySelector('.err'); er && er.remove(); } }
+  if (k === 'refundReason'){ S.modal.reason = e.target.value; }
+  if (k === 'popq'){ const v = e.target.value.toLowerCase(); document.querySelectorAll('[data-poplist] .pop-item').forEach(b => b.style.display = b.dataset.label.toLowerCase().includes(v) ? '' : 'none'); }
+  if (k === 'navq'){ const v = e.target.value.toLowerCase(); document.querySelectorAll('.nav-item').forEach(b => b.style.display = b.textContent.toLowerCase().includes(v) ? '' : 'none'); }
+});
+document.addEventListener('change', e => {
+  const fld = e.target.dataset.field;
+  if (!fld || !S.form || !SELECT_FIELDS.includes(fld)) return;
+  S.form[fld] = e.target.value;
+  if (S.modal.type === 'studentForm' && (fld === 'center' || fld === 'course')) S.form.cls = '';
+  if (S.modal.type === 'classForm'){
+    if (fld === 'center'){ S.form.room = ROOMS[S.form.center][0]; S.form.teacher = TEACHERS[S.form.center][0]; }
+    if ((fld === 'course' || fld === 'center') && S.form.mode === 'add') S.form.code = suggestCode(S.form.center, S.form.course);
+  }
+  render();
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape'){ if (S.menu){ S.menu = null; render(); } else if (S.modal){ S.modal = null; S.form = null; render(); } else if (S.pop){ S.pop = null; render(); } else if (S.navOpen){ S.navOpen = false; render(); } return; }
+  if (e.key === 'Enter' && S.modal && (S.modal.type === 'studentForm' || S.modal.type === 'classForm') && e.target.tagName === 'INPUT'){ e.preventDefault(); S.modal.type === 'studentForm' ? saveStudent() : saveClass(); return; }
+  if (S.route !== 'approvals' || /INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName) || S.modal) return;
+  const list = APPROVALS.filter(a => a.status === S.apprTab).slice().reverse();
+  const i = list.findIndex(a => a.id === S.apprSel);
+  if (e.key === 'j' || e.key === 'k'){ const n = list[Math.min(list.length-1, Math.max(0, i + (e.key === 'j' ? 1 : -1)))]; if (n){ S.apprSel = n.id; S.apprErr = ''; render(); } }
+  if (e.key === 'a' && S.apprTab === 'wait') decide('done');
+  if (e.key === 'r' && S.apprTab === 'wait'){ S.apprErr = S.apprNote.trim() ? '' : 'Ghi góp ý trước khi trả lại để người gửi biết cần sửa gì.'; render(); const f = document.getElementById('fb'); f && f.focus(); }
+});
+window.addEventListener('resize', () => { if (S.pop) positionPop(); if (S.menu){ S.menu = null; render(); } });
+document.addEventListener('scroll', e => { if (Date.now() - (window.__lr||0) < 250) return; if (e.target.closest && e.target.closest('.pop')) return; if (S.pop && !S.menu){ S.pop = null; render(); return; } if (S.menu){ S.menu = null; render(); } }, true);
+
+render();
+</script>
+</body>
+</html>
