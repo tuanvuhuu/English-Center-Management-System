@@ -1,52 +1,46 @@
 # English Center Management System
 
-Hệ thống quản lý cho **4 trung tâm tiếng Anh thuộc một tổ chức**: quản lý tập trung, nhưng mỗi trung tâm có giá, lịch và chính sách riêng.
+Hệ thống nội bộ cho **4 cơ sở tiếng Anh thuộc một tổ chức**, dùng **5–6 người**. Bản này làm gọn: chỉ giữ việc người dùng làm hằng ngày.
 
 Giao tiếp với chủ dự án bằng **tiếng Việt**.
 
 ## Tài liệu nghiệp vụ (đọc trước khi làm bất cứ việc gì)
 
-Toàn bộ yêu cầu nghiệp vụ nằm trong `docs/nghiep-vu/`:
+Toàn bộ yêu cầu nghiệp vụ nằm trong `docs/nghiep-vu/`. Bản này thay thế bộ tài liệu nhiều file trước đó.
 
 | File | Nội dung |
 | --- | --- |
-| `00-tong-quan.md` | Tổng quan, 13 nhóm nghiệp vụ, rủi ro dữ liệu, phân giai đoạn |
-| `01-to-chuc-nam-hoc.md` | Tổ chức, trung tâm, phòng, ngày nghỉ, năm học |
-| `02-chuong-trinh-khoa-hoc.md` | Chương trình → cấp độ → khóa, mô hình bán, bảng giá |
-| `03-hoc-vien-phu-huynh.md` | Hồ sơ học viên, phụ huynh, người thanh toán |
-| `04-ghi-danh-quy-buoi-hoc.md` | **Lõi hệ thống**: ghi danh, vòng đời, sổ phát sinh buổi |
-| `05-lop-lich-hoc-bu.md` | Lớp, sinh lịch, hủy/dời buổi, học bù |
-| `06-diem-danh-ket-qua-hoc-tap.md` | Điểm danh, khóa điểm danh, nhận xét, kiểm tra |
-| `07-hoc-phi-tai-chinh.md` | Công nợ, phiếu thu, ưu đãi, hoàn phí, khóa sổ |
-| `08-giao-vien-nhan-su.md` | Giáo viên, phân công, chấm công, thù lao |
-| `09-tuyen-sinh-giu-chan.md` | Lead, test, học thử, tái ghi danh |
-| `10-cong-phu-huynh-thong-bao.md` | Cổng phụ huynh, kênh thông báo |
-| `11-bao-cao-phan-tich.md` | Báo cáo và định nghĩa chỉ số |
-| `12-phan-quyen-nhat-ky.md` | Ma trận quyền, nhật ký thay đổi |
-| `13-so-quyet-dinh.md` | **20 quyết định nghiệp vụ còn mở** và đề xuất mặc định |
+| `00-tong-quan.md` | Mục tiêu, nguyên tắc, phạm vi làm và để sau |
+| `01-nguoi-dung-quyen.md` | Sáu vai trò và quyền |
+| `02-hoc-vien-khoa-lop.md` | Học viên, khóa học và giá, lớp, ngày nghỉ, buổi học |
+| `03-ghi-danh-diem-danh.md` | Ghi danh, số buổi còn lại, điểm danh, quyền bù |
+| `04-thu-tien-hoc-phi.md` | Giảm giá, phiếu thu, công nợ, hủy phiếu, điều chỉnh, hoàn phí |
+| `05-giao-vien-bang-cong.md` | Hồ sơ giáo viên, tính công, bảng công tháng |
+| `06-tuyen-sinh-diem.md` | Khách tiềm năng, bài kiểm tra, nhận xét |
+| `07-bao-cao-nhat-ky.md` | Trang chủ, báo cáo tháng, nhật ký, báo cáo bất thường |
+| `08-tham-so-quyet-dinh.md` | Quyết định đã chốt và bảng tham số mặc định |
 
-Bản gốc có thể chỉnh sửa nằm trong Claude Doc "Phân tích nghiệp vụ ban đầu"; các file ở đây là bản xuất. Khi nghiệp vụ thay đổi, cập nhật file tương ứng trong `docs/nghiep-vu/`.
+Kế hoạch giao việc theo từng tính năng nằm ở `docs/ke-hoach-tinh-nang.md`.
 
 ## Bất biến nghiệp vụ (không được vi phạm trong code)
 
-1. **Ghi danh là trung tâm**: 1 học viên × 1 khóa/gói × 1 trung tâm × giá và phiên bản chính sách tại thời điểm ký.
-2. **Số buổi và số tiền là sổ phát sinh (ledger), không phải con số sửa tay.** Số dư luôn được tính từ các phát sinh. Không có thao tác "sửa số buổi còn lại".
-3. **Phát sinh không xóa.** Sai thì tạo phát sinh đảo. Phiếu thu không xóa: chỉ hủy kèm lý do hoặc lập phiếu điều chỉnh.
-4. Nghiệp vụ thay đổi **cả buổi và tiền** (chuyển, hoàn phí, bảo lưu) phải nằm trong **một giao dịch duy nhất**.
-5. **Đơn giá thực trả mỗi buổi** = học phí sau ưu đãi ÷ số buổi mua; dùng thống nhất cho chuyển, bảo lưu, hoàn phí, ghi nhận doanh thu.
-6. Chính sách có **phiên bản và ngày hiệu lực**; không áp ngược cho ghi danh đã ký.
-7. Tách **công nợ / tiền đã thu / doanh thu thực hiện / tiền nhận trước**.
-8. Dữ liệu đã **khóa sổ** (điểm danh quá hạn, tháng kế toán) không sửa trực tiếp.
-9. Mọi thay đổi trên dữ liệu tiền, buổi, điểm danh, điểm số, giá, quyền phải có **nhật ký**: ai, khi nào, cũ → mới, lý do, người duyệt.
-10. **Không giả định 4 trung tâm giống nhau.** Các con số chính sách (hạn báo vắng, hạn bảo lưu, % hoàn phí, sĩ số, trần ưu đãi…) phải **cấu hình được theo trung tâm**, không hard-code.
+1. **Ghi danh là trung tâm:** một học viên × một lớp × một cơ sở, giá tính tại thời điểm ký.
+2. **Số buổi còn lại và số tiền nợ được tính từ lịch sử** (buổi đã diễn ra, phiếu thu, phiếu điều chỉnh). Không có thao tác sửa tay con số này.
+3. **Không xóa dữ liệu đã phát sinh.** Phiếu thu chỉ hủy trong cùng ngày, kèm lý do. Sau ngày thì lập phiếu điều chỉnh.
+4. **Thay đổi cả buổi và tiền** (hoàn phí, đổi lớp, bảo lưu, nghỉ) phải nằm trong **một giao dịch duy nhất**.
+5. **Đơn giá thực trả mỗi buổi** = học phí sau giảm giá ÷ số buổi mua. Dùng cho hoàn phí.
+6. **Giá và số buổi chuẩn của khóa đổi** chỉ áp dụng cho ghi danh mới.
+7. **Mọi thay đổi về tiền, buổi, điểm danh, điểm, giá, người dùng** phải có nhật ký: ai, khi nào, cũ → mới, lý do. Nhật ký không ai sửa hoặc xóa được.
+8. **Không có bước duyệt.** Kiểm soát bằng quyền theo vai trò và lý do bắt buộc.
+9. **Số liệu cấu hình** (ngưỡng, thời hạn, phí) nằm trong `packages/domain/src/policy.ts`, không viết thẳng trong code.
 
-## Quyết định còn mở
+## Quyết định
 
-Các giá trị trong `13-so-quyet-dinh.md` đang ở trạng thái "Chưa chốt". Được phép code theo đề xuất mặc định **chỉ khi** giá trị đó là tham số cấu hình. Nếu một quyết định làm thay đổi cấu trúc dữ liệu (đặc biệt QĐ-01, QĐ-02, QĐ-05, QĐ-11, QĐ-18), hỏi chủ dự án trước.
+Các quyết định đã chốt và tham số mặc định nằm ở `docs/nghiep-vu/08-tham-so-quyet-dinh.md`. Nếu việc cần làm đi ngược với tài liệu này, hỏi chủ dự án trước khi làm.
 
 ## Trạng thái dự án và cách làm việc
 
-- Đã có bản chạy được: `packages/domain` (lõi nghiệp vụ + test), `apps/api` (Fastify + SQLite), `apps/web` (React + Vite). Xem `README.md` để chạy.
-- Không cần chờ chốt Sổ quyết định: dùng đề xuất mặc định, giữ chúng trong `packages/domain/src/policy.ts` để đổi được.
-- Mọi thay đổi chạm vào buổi/tiền phải đi qua `@ecms/domain` và có test. Chạy `npm test` trước khi commit.
-- Giao diện: cam là màu thương hiệu, xanh lá là màu phụ, đỏ chỉ cho cảnh báo; mobile-first (menu kéo, bảng thành thẻ).
+- Đang chạy: `packages/domain` (lõi nghiệp vụ và test), `apps/api` (Fastify + SQLite), `apps/web` (React + Vite). Xem `README.md` để chạy.
+- Dữ liệu SQLite nằm ở file `ecms.db` (biến môi trường `ECMS_DB`). Không xóa file này khi chưa có yêu cầu.
+- Mọi thay đổi chạm vào buổi, tiền hoặc điểm danh phải đi qua `@ecms/domain` và có test. Chạy `npm test` trước khi báo xong.
+- **Giao diện:** màu nhận diện là **đỏ son**, đồng bộ với sản phẩm chị em "EMS · Tổ chức thi". Không dùng cam làm màu chính. Xanh lá là màu phụ, đỏ cũng là màu cảnh báo. Mobile-first: menu kéo, bảng thành thẻ trên điện thoại.
