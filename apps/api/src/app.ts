@@ -289,7 +289,7 @@ export function buildApp(db: DB): FastifyInstance {
     for (const { id } of ens) {
       const sm = S.enrollmentSummary(db, id);
       if (sm.money.receivable <= 0) continue;
-      const i = db.prepare('SELECT s.name, s.code, s.guardian_phone, cl.code AS class_code FROM enrollments e JOIN students s ON s.id=e.student_id JOIN classes cl ON cl.id=e.class_id WHERE e.id=?').get(id) as any;
+      const i = db.prepare('SELECT s.id AS student_id, s.name, s.code, s.guardian_phone, cl.code AS class_code FROM enrollments e JOIN students s ON s.id=e.student_id JOIN classes cl ON cl.id=e.class_id WHERE e.id=?').get(id) as any;
       out.push({ enrollment_id: id, ...i, net: sm.enrollment.net, collected: sm.money.collected, receivable: sm.money.receivable, created_at: sm.enrollment.created_at });
     }
     return out.sort((a, b) => b.receivable - a.receivable);

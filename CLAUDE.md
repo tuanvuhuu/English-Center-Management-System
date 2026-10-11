@@ -46,7 +46,7 @@ Các giá trị trong `13-so-quyet-dinh.md` đang ở trạng thái "Chưa chố
 
 ## Trạng thái dự án và cách làm việc
 
-- Mới hoàn thành phân tích nghiệp vụ. **Chưa chọn công nghệ, chưa thiết kế dữ liệu, chưa có kiến trúc.**
-- Trước khi viết code: đề xuất tech stack, mô hình dữ liệu cho Giai đoạn 1 và cấu trúc thư mục. Chờ chủ dự án duyệt rồi mới làm.
-- Làm theo **Giai đoạn 1** trong `00-tong-quan.md`, từng module một, ưu tiên: tổ chức/trung tâm → học viên/phụ huynh → khóa học/bảng giá → lớp/lịch → ghi danh + sổ phát sinh buổi → điểm danh → học phí → phân quyền/nhật ký → báo cáo vận hành.
-- Module ghi danh, sổ phát sinh buổi và học phí phải có **test tự động** bao phủ các tình huống ngoại lệ trong file 04 và 07.
+- Đã có bản chạy được: `packages/domain` (lõi nghiệp vụ + test), `apps/api` (Fastify + SQLite), `apps/web` (React + Vite). Xem `README.md` để chạy.
+- Không cần chờ chốt Sổ quyết định: dùng đề xuất mặc định, giữ chúng trong `packages/domain/src/policy.ts` để đổi được.
+- Mọi thay đổi chạm vào buổi/tiền phải đi qua `@ecms/domain` và có test. Chạy `npm test` trước khi commit.
+- Giao diện: cam là màu thương hiệu, xanh lá là màu phụ, đỏ chỉ cho cảnh báo; mobile-first (menu kéo, bảng thành thẻ).

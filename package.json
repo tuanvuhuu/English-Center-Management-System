@@ -1,1 +1,15 @@
-{ "name": "english-center-management-system", "private": true, "workspaces": ["packages/*", "apps/*"], "scripts": { "test": "npm test --workspaces --if-present" } }
+{
+  "name": "english-center-management-system",
+  "private": true,
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "test": "npm test --workspaces --if-present",
+    "dev:api": "npm run dev -w @ecms/api",
+    "dev:web": "npm run dev -w @ecms/web",
+    "build:web": "npm run build -w @ecms/web",
+    "seed": "npm run seed -w @ecms/api"
+  }
+}
