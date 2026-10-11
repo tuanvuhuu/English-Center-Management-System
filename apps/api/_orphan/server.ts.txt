@@ -1,0 +1,7 @@
+import { buildApp } from './app.js';
+import { openDb } from './db.js';
+const db = openDb(process.env.ECMS_DB ?? './ecms.sqlite');
+const app = buildApp({ db });
+const port = Number(process.env.PORT ?? 3001);
+await app.listen({ port, host: '0.0.0.0' });
+console.log(`ECMS API chạy tại http://localhost:${port}`);

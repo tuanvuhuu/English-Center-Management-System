@@ -1,0 +1,143 @@
+import { describe, it, expect, beforeEach } from 'vitest';
+import { buildApp } from '../src/app.js';
+
+let clock = '2026-10-01T09:00:00.000Z';
+let app: ReturnType<typeof buildApp>;
+beforeEach(() => { clock = '2026-10-01T09:00:00.000Z'; app = buildApp({ now: () => clock }); });
+const call = async (method: string, url: string, body?: unknown, actor = 'le-tan') => {
+  const r = await app.inject({ method: method as any, url, payload: body as any, headers: { 'x-actor': actor } });
+  return { status: r.statusCode, body: r.body ? JSON.parse(r.body) : null };
+};
+const newStudent = async (o: Record<string, unknown> = {}) =>
+  (await call('POST', '/api/students', { centerId: 'cg', name: 'Nguyễn Minh Khang', parentName: 'Chị Trang', phone: '0912633418', ...o })).body;
+const enroll = async (studentId: string, classId = 'cls1', extra: Record<string, unknown> = {}) => call('POST', '/api/enrollments', { studentId, classId, ...extra });
+
+describe('Học viên', () => {
+  it('thêm, tìm, sửa; chặn SĐT sai và hồ sơ trùng', async () => {
+    const s = await newStudent();
+    expect(s.id).toMatch(/^hv_/);
+    expect((await call('POST', '/api/students', { centerId: 'cg', name: 'A', parentName: 'B', phone: '123' })).status).toBe(400);
+    expect((await call('POST', '/api/students', { centerId: 'cg', name: 'Nguyễn Minh Khang', parentName: 'Chị Trang', phone: '0912633418' })).status).toBe(409);
+    expect((await call('GET', '/api/students?search=Khang')).body).toHaveLength(1);
+    const u = await call('PATCH', `/api/students/${s.id}`, { note: 'Dị ứng phấn' });
+    expect(u.body.note).toBe('Dị ứng phấn');
+  });
+  it('xóa hồ sơ chưa có giao dịch; có giao dịch thì chỉ ngừng hoạt động', async () => {
+    const a = await newStudent(); expect((await call('DELETE', `/api/students/${a.id}`)).status).toBe(204);
+    const b = await newStudent({ phone: '0987000111' }); await enroll(b.id);
+    const r = await call('DELETE', `/api/students/${b.id}`);
+    expect(r.body.deactivated).toBe(true);
+    expect((await call('GET', `/api/students/${b.id}`)).body.status).toBe('inactive');
+  });
+});
+
+describe('Ghi danh & sổ buổi', () => {
+  it('ghi danh tạo phát sinh mua buổi; chặn ghi danh trùng', async () => {
+    const s = await newStudent(); const e = await enroll(s.id);
+    expect(e.status).toBe(201);
+    expect(e.body).toMatchObject({ sessions_bought: 30, net: 7_500_000, remaining: 30 });
+    expect(e.body.money).toMatchObject({ receivable: 7_500_000, collected: 0 });
+    expect((await enroll(s.id)).status).toBe(409);
+  });
+  it('ưu đãi vượt mức cần người duyệt', async () => {
+    const s = await newStudent();
+    const d = [{ code: 'a', kind: 'percent', value: 20 }, { code: 'b', kind: 'percent', value: 15 }];
+    expect((await enroll(s.id, 'cls1', { discounts: d })).status).toBe(400);
+    const ok = await enroll(s.id, 'cls1', { discounts: d, approvedBy: 'qltt' });
+    expect(ok.body.net).toBe(4_875_000);
+  });
+  it('điểm danh trừ buổi; vắng có phép +1 quyền bù; báo trễ thành không phép', async () => {
+    const s = await newStudent(); const e = (await enroll(s.id)).body; const id = e.id;
+    const att = (b: object) => call('POST', `/api/enrollments/${id}/attendance`, { sessionStart: '2026-10-10T12:00:00Z', sessionEnd: '2026-10-10T13:30:00Z', ...b });
+    clock = '2026-10-10T13:40:00.000Z';
+    let r = await att({ status: 'present', sessionRef: 'b1' }); expect(r.body.balance).toEqual({ sessions: 29, makeup: 0 });
+    r = await att({ status: 'excused', sessionRef: 'b2', reportedAt: '2026-10-09T08:00:00Z' }); expect(r.body.appliedStatus).toBe('excused');
+    expect(r.body.balance).toEqual({ sessions: 28, makeup: 1 });
+    r = await att({ status: 'excused', sessionRef: 'b3', reportedAt: '2026-10-10T08:00:00Z' }); expect(r.body.appliedStatus).toBe('unexcused');
+    r = await att({ status: 'makeup', sessionRef: 'b4' }); expect(r.body.balance).toEqual({ sessions: 27, makeup: 0 });
+    expect((await att({ status: 'makeup', sessionRef: 'b5' })).status).toBe(400);
+  });
+  it('sửa điểm danh = đảo dòng cũ (không xóa); quá 48 giờ cần duyệt + lý do', async () => {
+    const s = await newStudent(); const id = (await enroll(s.id)).body.id;
+    const b = { sessionStart: '2026-10-10T12:00:00Z', sessionEnd: '2026-10-10T13:30:00Z', sessionRef: 'b1' };
+    clock = '2026-10-10T13:40:00.000Z';
+    await call('POST', `/api/enrollments/${id}/attendance`, { ...b, status: 'unexcused' });
+    let r = await call('POST', `/api/enrollments/${id}/attendance`, { ...b, status: 'present', reason: 'nhầm' });
+    expect(r.status).toBe(201); expect(r.body.balance.sessions).toBe(29);
+    clock = '2026-10-20T00:00:00.000Z';
+    expect((await call('POST', `/api/enrollments/${id}/attendance`, { ...b, status: 'unexcused' })).status).toBe(400);
+    r = await call('POST', `/api/enrollments/${id}/attendance`, { ...b, status: 'unexcused', reason: 'GV báo lại', approvedBy: 'qltt' });
+    expect(r.status).toBe(201);
+    const led = (await call('GET', `/api/enrollments/${id}/ledger`)).body.entries;
+    expect(led.filter((x: any) => x.type === 'reversal')).toHaveLength(2);
+    expect(led.length).toBe(6);
+  });
+});
+
+describe('Học phí', () => {
+  it('thu tiền, chặn thu vượt, hủy trong ngày, điều chỉnh sau ngày', async () => {
+    const s = await newStudent(); const id = (await enroll(s.id)).body.id;
+    expect((await call('POST', `/api/enrollments/${id}/payments`, { amount: 8_000_000 })).status).toBe(400);
+    const p = await call('POST', `/api/enrollments/${id}/payments`, { amount: 3_000_000 });
+    expect(p.body.money).toMatchObject({ collected: 3_000_000, receivable: 4_500_000 });
+    const v = await call('POST', `/api/receipts/${p.body.receiptId}/void`, { reason: 'nhập nhầm' });
+    expect(v.body.money.collected).toBe(0);
+    const p2 = await call('POST', `/api/enrollments/${id}/payments`, { amount: 2_000_000 });
+    clock = '2026-10-02T09:00:00.000Z';
+    expect((await call('POST', `/api/receipts/${p2.body.receiptId}/void`, { reason: 'x' })).status).toBe(400);
+    const a = await call('POST', `/api/receipts/${p2.body.receiptId}/adjust`, { delta: -500_000, reason: 'thu nhầm' });
+    expect(a.body.money.collected).toBe(1_500_000);
+  });
+  it('báo cáo tổng quan khớp số liệu', async () => {
+    const s = await newStudent(); const id = (await enroll(s.id)).body.id;
+    await call('POST', `/api/enrollments/${id}/payments`, { amount: 7_500_000 });
+    const r = (await call('GET', '/api/reports/overview?centerId=cg')).body;
+    expect(r).toMatchObject({ students: 1, activeEnrollments: 1, collected: 7_500_000, receivable: 0, debtors: 0 });
+  });
+});
+
+describe('Bảo lưu & hoàn phí', () => {
+  it('bảo lưu 1 lần; quay lại học', async () => {
+    const s = await newStudent(); const id = (await enroll(s.id)).body.id;
+    expect((await call('POST', `/api/enrollments/${id}/freeze`)).body.status).toBe('frozen');
+    expect((await call('POST', `/api/enrollments/${id}/resume`)).body.status).toBe('active');
+    expect((await call('POST', `/api/enrollments/${id}/freeze`)).status).toBe(400);
+  });
+  it('hoàn phí: tách 3 người, tính theo công thức, trừ buổi và tiền trong một giao dịch', async () => {
+    const s = await newStudent(); const id = (await enroll(s.id)).body.id;
+    await call('POST', `/api/enrollments/${id}/payments`, { amount: 7_500_000 });
+    const body = { reason: 'Chuyển nhà', approvedBy: 'qltt', paidBy: 'ke-toan' };
+    const dry = await call('POST', `/api/enrollments/${id}/refund`, { ...body, dryRun: true });
+    expect(dry.body.calc).toMatchObject({ gross: 7_500_000, fee: 750_000, amount: 6_750_000, needsAdmin: true });
+    expect((await call('POST', `/api/enrollments/${id}/refund`, { ...body, approvedBy: 'le-tan' })).status).toBe(400);
+    expect((await call('POST', `/api/enrollments/${id}/refund`, body)).body.error).toMatch(/admin/);
+    const r = await call('POST', `/api/enrollments/${id}/refund`, { ...body, adminApprovedBy: 'admin' });
+    expect(r.status).toBe(200);
+    expect(r.body.enrollment).toMatchObject({ status: 'dropped', remaining: 0 });
+    expect(r.body.enrollment.money.collected).toBe(750_000);
+    expect((await call('POST', `/api/enrollments/${id}/refund`, { ...body, adminApprovedBy: 'admin' })).status).toBe(400);
+  });
+  it('nhật ký ghi đủ thao tác', async () => {
+    const s = await newStudent(); await enroll(s.id);
+    const log = (await call('GET', '/api/audit')).body;
+    expect(log.map((x: any) => x.action)).toEqual(expect.arrayContaining(['create']));
+    expect(log.length).toBeGreaterThanOrEqual(2);
+  });
+});
+
+describe('Lớp & khóa', () => {
+  it('chặn trùng mã lớp, trùng phòng/lịch; không xóa lớp còn học viên', async () => {
+    const dup = await call('POST', '/api/classes', { centerId: 'cg', courseId: 'pet', code: 'STA-1' });
+    expect(dup.status).toBe(409);
+    const room = await call('POST', '/api/classes', { centerId: 'cg', courseId: 'pet', code: 'X-1', room: 'P104', schedule: 'T3, T5 18:00' });
+    expect(room.status).toBe(409);
+    const s = await newStudent(); await enroll(s.id);
+    expect((await call('DELETE', '/api/classes/cls1')).status).toBe(400);
+  });
+  it('lớp đủ sĩ số thì từ chối', async () => {
+    const c = (await call('POST', '/api/classes', { centerId: 'cg', courseId: 'pet', code: 'MINI', capacity: 1 })).body;
+    const a = await newStudent(); const b = await newStudent({ phone: '0987000222', name: 'Trần B' });
+    expect((await enroll(a.id, c.id)).status).toBe(201);
+    expect((await enroll(b.id, c.id)).status).toBe(400);
+  });
+});

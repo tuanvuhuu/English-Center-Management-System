@@ -431,3 +431,12 @@ FodyWeavers.xsd
 !**/packages/
 !**/packages/*
 node_modules/
+
+# ECMS
+*.db
+*.db-wal
+*.db-shm
+.vite/
+dist/
+!**/apps/
+!**/apps/*
